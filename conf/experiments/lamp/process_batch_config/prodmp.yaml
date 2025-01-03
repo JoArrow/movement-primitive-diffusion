@@ -1,0 +1,24 @@
+# @package agent_config.process_batch_config
+_target_: movement_primitive_diffusion.datasets.process_batch.ProcessBatchProDMP
+_recursive_: False
+
+t_obs: ${t_obs}
+t_pred: ${t_pred}
+relative_action_values: False  # <- can be used to create actions sequences that start with 0 as the first action
+
+
+# Note: the order matters here, because the action keys are concatenated
+action_keys:
+  # - key: action_l
+  #   feature_size: null # set in python based on dataset
+  - key: action_r
+    feature_size: null # set in python based on dataset
+
+
+initial_values_come_from_action_data: True  # <- if time_series_a.npz stores action values,
+# the values are "desired values for time t+1", so the values will be shifted by 1 to get the initial values
+initial_position_keys: # <- used by the ProDMP to set the initial values of the action sequence
+  # - action_l
+  - action_r
+observation_keys: null # set in python based on encoder
+initial_velocity_keys: [action_vel_r]
