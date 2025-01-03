@@ -19,7 +19,7 @@ multirun
 wandb
 
 # data folder
-data
+#data
 
 # stored model checkpoints
 model_checkpoints
