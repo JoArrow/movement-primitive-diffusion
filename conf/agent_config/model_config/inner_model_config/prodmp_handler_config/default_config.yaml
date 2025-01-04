@@ -3,7 +3,7 @@ _recursive_: False
 
 num_dof: ${agent_config.model_config.inner_model_config.action_size}
 dt: ${dataset_config.dt} # TODO could also be set based on ${dataset_config.target_dt}, if not null
-precompute_dt: 0.01
+precompute_dt: 0.005555556 # 1/180
 traj_steps: ${t_pred}
 weights_scale: 1.0
 goal_scale: 1.0
