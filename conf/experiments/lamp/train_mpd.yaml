@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - workspace_config: dummy  # TODO This will use a dummy workspace that does not contain an environment for evaluation of the trained agent. See below for more information about workspaces.
+  - workspace_config: single  # This will use a dummy workspace that does not contain an environment for evaluation of the trained agent. See below for more information about workspaces.
   - dataset_config: dataset
   - /agent_config: prodmp_transformer_agent  # <- this is defined in ./conf/agent_config/prodmp_transformer_agent.yaml
   - process_batch_config: prodmp
