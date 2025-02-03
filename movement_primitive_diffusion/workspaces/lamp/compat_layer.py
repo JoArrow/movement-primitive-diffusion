@@ -1,22 +1,37 @@
 from movement_primitive_diffusion.utils.helper import deque_to_array
-from examples.aloha_env_cfg import AlohaEnvCfg
-from examples.utils.furniture_utils import furniture_assembly_check
-from omni.isaac.lab.envs import ManagerBasedEnv # type: ignore
-from omni.isaac.lab.assets import Articulation # type: ignore
+
+import os, sys
+
+# TODO: Why is this needed? If paths are not appended, different packages will not be found
+# Add the Isaac SDK paths to the Python path
+#isaac_sim_path = os.path.abspath('/home/i53/student/pfeil/.local/share/ov/pkg/isaac-sim-4.2.0')
+#sys.path.append(os.path.join(isaac_sim_path, 'exts/omni.isaac.core'))
+#sys.path.append(os.path.join(isaac_sim_path, 'exts/omni.isaac.lab'))
+#sys.path.append(os.path.join(isaac_sim_path, 'kit/python/lib/python3.10/site-packages'))
+
+
+
+from omni.isaac.lab.envs import ManagerBasedEnv
+from omni.isaac.lab.assets import Articulation
 from typing import Any, Dict, List, Tuple, Optional, Union
 from collections import deque, defaultdict
 from functools import partial
 import torch
 
+from examples.utils.furniture_utils import furniture_assembly_check
+from examples.aloha_env_cfg import AlohaEnvCfg
 
 
 class AlohaLampEnv(ManagerBasedEnv):
-    def __init__(self):
+    def __init__(self,
+                 t_obs: int,
+                 time_limit: Optional[int] = None):
+        
         env_cfg = AlohaEnvCfg(task='lamp')  
-        super().__init__(env_cfg)
+        super().__init__(cfg=env_cfg)
 
-        t_obs: int                          # TODO: Set it in the env_config?
-        time_limit: Optional[int] = None    # TODO: Set it in the env_config?
+        self.t_obs = t_obs
+        self.time_limit = time_limit
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
         self.time_step_counter: int = 0
