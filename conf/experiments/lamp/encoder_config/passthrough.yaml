@@ -2,8 +2,8 @@
 _target_: movement_primitive_diffusion.encoder.Encoder
 _recursive_: False
 t_obs: ${t_obs}
-network_configs:
 
+network_configs:
   # Lamp parts
   - observation_key: lamp_base
     feature_size: null # set in python based on dataset
@@ -19,20 +19,20 @@ network_configs:
       _target_: movement_primitive_diffusion.networks.layers.PassThrough
 
   # Robot arm positions
-#  - observation_key: agent_pos_l
-#    feature_size: null # set in python based on dataset
-#    network_config:
-#      _target_: movement_primitive_diffusion.networks.layers.PassThrough
+  - observation_key: agent_pos_l
+    feature_size: null # set in python based on dataset
+    network_config:
+      _target_: movement_primitive_diffusion.networks.layers.PassThrough
   - observation_key: agent_pos_r
     feature_size: null # set in python based on dataset
     network_config:
       _target_: movement_primitive_diffusion.networks.layers.PassThrough
   
   # Robot arm velocities
-  # - observation_key: agent_vel_l
-  #   feature_size: null # set in python based on dataset
-  #   network_config:
-  #     _target_: movement_primitive_diffusion.networks.layers.PassThrough
+  - observation_key: agent_vel_l
+    feature_size: null # set in python based on dataset
+    network_config:
+      _target_: movement_primitive_diffusion.networks.layers.PassThrough
   - observation_key: agent_vel_r
     feature_size: null # set in python based on dataset
     network_config:
