@@ -4,11 +4,11 @@ _recursive_: False
 subsequence_length: ${eval:'${t_obs}+${t_pred}-1'}
 trajectory_dirs: null # set in python code
 keys:
-#  - action_l
+  - action_l
   - action_r
-#  - agent_pos_l
+  - agent_pos_l
   - agent_pos_r
-#  - agent_vel_l
+  - agent_vel_l
   - agent_vel_r
   - lamp_base
   - lamp_bulb
