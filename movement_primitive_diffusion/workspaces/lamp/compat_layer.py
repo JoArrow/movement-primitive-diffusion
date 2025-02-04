@@ -112,8 +112,8 @@ class AlohaLampEnv(ManagerBasedEnv):
 
         self.reset() # reset the environment
 
-        robot_left: Articulation = self.scene["robot_left"]  
-        robot_right: Articulation = self.scene["robot_right"]
+        self.robot_left: Articulation = self.scene["robot_left"]  
+        self.robot_right: Articulation = self.scene["robot_right"]
 
         # Create the robot controller
         self.controller_left = AlohaController(self, "robot_left")  
@@ -159,7 +159,7 @@ class AlohaLampEnv(ManagerBasedEnv):
         terminated = furniture_assembly_check('lamp', part_poses)
         self.time_step_counter += 1
         truncated = False
-        if self.time_limit is not None and self.scene.time > self.time_limit:
+        if self.time_limit and self.time_step_counter > self.time_limit:
             terminated = True
             truncated = True
 
@@ -195,16 +195,16 @@ class AlohaLampEnv(ManagerBasedEnv):
 
 
         if self.latest_action is not None:
-            self.observation_buffer["action_l"].append(self.latest_action[1, :7])
-            self.observation_buffer["action_r"].append(self.latest_action[1, 7:])
+            self.observation_buffer["action_l"].append(self.latest_action[:7])
+            self.observation_buffer["action_r"].append(self.latest_action[7:])
         else:
             self.observation_buffer["action_l"].append(torch.zeros(7))
             self.observation_buffer["action_r"].append(torch.zeros(7))
         
 
         if self.latest_action_vel is not None:
-            self.observation_buffer["action_vel_l"].append(self.latest_action_vel[1, :7])
-            self.observation_buffer["action_vel_r"].append(self.latest_action_vel[1, 7:])
+            self.observation_buffer["action_vel_l"].append(self.latest_action_vel[:7])
+            self.observation_buffer["action_vel_r"].append(self.latest_action_vel[7:])
         else:
             self.observation_buffer["action_vel_l"].append(torch.zeros(7))
             self.observation_buffer["action_vel_r"].append(torch.zeros(7))
