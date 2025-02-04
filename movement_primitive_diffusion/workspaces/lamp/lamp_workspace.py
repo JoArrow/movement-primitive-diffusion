@@ -127,18 +127,3 @@ class AlohaLampWorkspace(BaseWorkspace):
 
         return self.get_result_dict(caller_locals=locals())
 
-
-
-if __name__ == "__main__":
-    env_config = {
-        '_target_': 'movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv',
-        '_recursive_': False,
-        't_obs': 3,
-        'time_limit': 5000,
-        'num_upload_successful_videos': 0,
-        'num_upload_failed_videos': 0,
-        'show_images': False
-    }
-
-    env_config = OmegaConf.create(env_config)
-    workspace = AlohaLampWorkspace(env_config, t_act=10)
