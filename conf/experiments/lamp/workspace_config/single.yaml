@@ -1,0 +1,18 @@
+_target_: movement_primitive_diffusion.workspaces.lamp.lamp_workspace.AlohaLampWorkspace
+_recursive_: False
+
+t_act: ${t_act}
+
+env_config:
+  _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
+  _recursive_: False
+
+  scaler_config:
+    scaler_values: null
+
+  t_obs: ${t_obs}
+  time_limit: 5000
+
+  num_upload_successful_videos: 0
+  num_upload_failed_videos: 0
+  show_images: False
