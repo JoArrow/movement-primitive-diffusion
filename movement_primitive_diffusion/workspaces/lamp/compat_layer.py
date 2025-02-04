@@ -116,12 +116,12 @@ class AlohaLampEnv(ManagerBasedEnv):
         robot_right: Articulation = self.scene["robot_right"]
 
         # Create the robot controller
-        controller_left = AlohaController(self, "robot_left")  
-        controller_right = AlohaController(self, "robot_right")
+        self.controller_left = AlohaController(self, "robot_left")  
+        self.controller_right = AlohaController(self, "robot_right")
 
         # Reset robot controller
-        controller_left.reset()  
-        controller_right.reset()
+        self.controller_left.reset()  
+        self.controller_right.reset()
 
         # TODO: set the robot arms in start position?
 
@@ -138,9 +138,9 @@ class AlohaLampEnv(ManagerBasedEnv):
     def step(self, action):
         self.latest_action = action
 
-        # TODO: what shape has action?
-        action_l = action[1, :7]
-        action_r = action[1, 7:]
+        action_l = action[:7]
+        action_r = action[7:]
+        assert(len(action_l) == len(action_r) == 7)
 
         self.controller_left.move_forward_kinematics(action_l)
         self.controller_right.move_forward_kinematics(action_r)
@@ -203,8 +203,8 @@ class AlohaLampEnv(ManagerBasedEnv):
         
 
         if self.latest_action_vel is not None:
-            self.observation_buffer["action_l_vel"].append(self.latest_action_vel[1, :7])
-            self.observation_buffer["action_r_vel"].append(self.latest_action_vel[1, 7:])
+            self.observation_buffer["action_vel_l"].append(self.latest_action_vel[1, :7])
+            self.observation_buffer["action_vel_r"].append(self.latest_action_vel[1, 7:])
         else:
-            self.observation_buffer["action_l_vel"].append(torch.zeros(7))
-            self.observation_buffer["action_r_vel"].append(torch.zeros(7))
+            self.observation_buffer["action_vel_l"].append(torch.zeros(7))
+            self.observation_buffer["action_vel_r"].append(torch.zeros(7))
