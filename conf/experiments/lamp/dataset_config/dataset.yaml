@@ -50,7 +50,8 @@ scaler_values:
       std: null
 recalculate_velocities_from_to: [] # <- if you normalize position values, the velocity values will not match anymore (0 velocity before scaling might not be 0 velocity after scaling)
  # <- calculate time_series_c (let's say these are joint velocities) from the normalized values of time_series_a using dt
-calculate_velocities_from_to: # dataset does not have action_velocities -> calculate
+calculate_velocities_from_to:  # dataset does not have action_velocities -> calculate
+  - [action_l, action_vel_l]
   - [action_r, action_vel_r]
 image_keys: []
 image_sizes: []

@@ -1,17 +1,18 @@
-# @package workspace_config
-_target_: movement_primitive_diffusion.workspaces.lamp.lamp_workspace.LampWorkspace
+_target_: movement_primitive_diffusion.workspaces.lamp.lamp_workspace.AlohaLampWorkspace
 _recursive_: False
 
 t_act: ${t_act}
 
-# TODO: set the correct values for the workspace. Is also used to init the environment
 env_config:
   _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
   _recursive_: False
 
   scaler_config:
-    scaler_values: null # set in python based on dataset
-  
-  t_act: ${t_act}
+    scaler_values: null
+
   t_obs: ${t_obs}
-  time_limit: 4000 # in number of steps. Multiply by dt to get the time in seconds
+  time_limit: 5000
+
+  num_upload_successful_videos: 0
+  num_upload_failed_videos: 0
+  show_images: False

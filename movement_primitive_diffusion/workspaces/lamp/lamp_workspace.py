@@ -1,41 +1,58 @@
-import hydra
-import numpy as np
-import torch
-
 from omegaconf import DictConfig
-from typing import List, Optional, Dict
 
-from movement_primitive_diffusion.agents.base_agent import BaseAgent
 from movement_primitive_diffusion.workspaces.base_workspace import BaseWorkspace
 
+from omni.isaac.lab.app import AppLauncher
+import torch
+import cv2
+import numpy as np
+from tqdm import tqdm
+from omegaconf import OmegaConf
+from movement_primitive_diffusion.agents.base_agent import BaseAgent
 
-class LampWorkspace(BaseWorkspace):
+
+class AlohaLampWorkspace(BaseWorkspace):
     def __init__(
         self,
         env_config: DictConfig,
-        t_act: int
-    ):
-        super().__init__(env_config = env_config,
-                         t_act = t_act)
+        t_act: int,
+        num_upload_successful_videos: int = 0,
+        num_upload_failed_videos: int = 0,
+        show_images: bool = False,
+        ):
+        
 
+        # Launch the simulation app
+        app_launcher = AppLauncher(headless=True)
+        simulation_app = app_launcher.app
 
+        
+        super().__init__(env_config, 
+                         t_act,
+                         num_upload_successful_videos,
+                         num_upload_failed_videos,
+                         show_images)
     
+        
 
-    # TODO: this function might need to be overwritten, as we do not use a gym class. In our case the step function does not return a reward
+
+    # TODO Adapt test_agent method, so we can setup AppLauncher etc to run the ManagerBasedEnv
     def test_agent(self, agent: BaseAgent, num_trajectories: int = 10) -> dict:
         self.num_successful_trajectories = 0
         self.num_failed_trajectories = 0
         frames_of_successful_trajectories = []
         frames_of_failed_trajectories = []
 
-        # TODO: nicer progressbar with steps_to_go like in BaseVectorWorkspace
+
+
+
         for i in (pbar := tqdm(range(num_trajectories), desc="Testing agent", leave=False)):
             self.reset_env(caller_locals=locals())
 
             done = False
             successful = False
             episode_frames = []
-            image_shape = self.render_function(caller_locals=locals()).shape
+            #image_shape = self.render_function(caller_locals=locals()).shape
 
             while not done:
                 observation_buffer = self.env.get_observation_dict()
@@ -67,12 +84,12 @@ class LampWorkspace(BaseWorkspace):
                     env_obs, reward, terminated, truncated, info = self.env.step(action)
 
                     # Render environment
-                    rgb_frame = self.render_function(caller_locals=locals())
-                    episode_frames.append(rgb_frame)
+                    #rgb_frame = self.render_function(caller_locals=locals())
+                    #episode_frames.append(rgb_frame)
 
-                    if self.show_images:
-                        cv2.imshow("Workspace", rgb_frame[..., ::-1])
-                        cv2.waitKey(1)
+                    #if self.show_images:
+                    #    cv2.imshow("Workspace", rgb_frame[..., ::-1])
+                    #    cv2.waitKey(1)
 
                     successful = self.check_success_hook(caller_locals=locals())
 
@@ -109,3 +126,19 @@ class LampWorkspace(BaseWorkspace):
         self.log_video(frames_of_failed_trajectories, fps=fps, metric="failed")
 
         return self.get_result_dict(caller_locals=locals())
+
+
+
+if __name__ == "__main__":
+    env_config = {
+        '_target_': 'movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv',
+        '_recursive_': False,
+        't_obs': 3,
+        'time_limit': 5000,
+        'num_upload_successful_videos': 0,
+        'num_upload_failed_videos': 0,
+        'show_images': False
+    }
+
+    env_config = OmegaConf.create(env_config)
+    workspace = AlohaLampWorkspace(env_config, t_act=10)
