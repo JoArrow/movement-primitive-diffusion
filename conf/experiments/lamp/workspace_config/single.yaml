@@ -11,7 +11,9 @@ env_config:
     scaler_values: null
 
   t_obs: ${t_obs}
-  time_limit: 5000
+  dt: 0.005555556
+  time_limit: 500
+
 
   num_upload_successful_videos: 0
   num_upload_failed_videos: 0

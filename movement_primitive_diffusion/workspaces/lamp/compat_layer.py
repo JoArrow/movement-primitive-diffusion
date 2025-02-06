@@ -26,6 +26,8 @@ from .examples.aloha_env_cfg import AlohaEnvCfg
 OPEN_THRESH = 1.0
 CLOSE_THRESH = 0.0
 
+START_ARM_POSE = [00, -0.96, 1.16, 0, -0.3, 0, 0.02239, -0.02239]
+START_ARM_VEL = [0, 0, 0, 0, 0, 0, 0, 0]
 
 class AlohaController:
     GRIPPER_FORCE = 25 
@@ -93,25 +95,28 @@ class AlohaController:
 class AlohaLampEnv(ManagerBasedEnv):
     def __init__(self,
                  t_obs: int,
+                 dt = 0.005555556,
                  scaler_config: DictConfig = None,
                  time_limit: Optional[int] = None,
                  num_upload_successful_videos: int = 0,
                  num_upload_failed_videos: int = 0,
-                 show_images: bool = False,):
+                 show_images: bool = False,
+                 ):
         
-        env_cfg = AlohaEnvCfg(task='lamp')  
+        env_cfg = AlohaEnvCfg(task='lamp', 
+                              dt = dt)  
         super().__init__(cfg=env_cfg)
 
         self.t_obs = t_obs
         self.time_limit = time_limit
+        self.dt = dt
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
         self.latest_action = None
         self.latest_action_vel = None
         self.time_step_counter: int = 0
 
-        self.reset() # reset the environment
-
+        # Get the robot articulations
         self.robot_left: Articulation = self.scene["robot_left"]  
         self.robot_right: Articulation = self.scene["robot_right"]
 
@@ -119,21 +124,37 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.controller_left = AlohaController(self, "robot_left")  
         self.controller_right = AlohaController(self, "robot_right")
 
+
+    def reset(self, *args, **kwargs):
+        # reset step counter
+        self.time_step_counter = 0
+
         # Reset robot controller
         self.controller_left.reset()  
         self.controller_right.reset()
 
-        # TODO: set the robot arms in start position?
+        # Beaming to start position and velocity
+        self.controller_left.set_robot_joint_pos(torch.tensor(START_ARM_POSE), 
+                                                 torch.tensor(START_ARM_VEL))
+        self.controller_right.set_robot_joint_pos(torch.tensor(START_ARM_POSE),
+                                                  torch.tensor(START_ARM_VEL))
 
-    def reset(self, *args, **kwargs):
-        obs, info = super().reset(*args, **kwargs)
-        self.time_step_counter = 0
+        # reset environment
+        obs, info = super().reset() # TODO: rogodbodies are not reset and also not placed in new randomized positions
 
         # Fill observation buffer with initial values
         for _ in range(self.t_obs):
             self.update_observation_buffer()
 
         return obs, info
+
+
+
+    def check_success(self):
+        part_poses = {part: self.scene[part].data.root_state_w[0][:7].cpu().numpy() for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']}
+        return furniture_assembly_check('lamp', part_poses)
+
+
 
     def step(self, action):
         self.latest_action = action
@@ -150,13 +171,12 @@ class AlohaLampEnv(ManagerBasedEnv):
 
         self.update_observation_buffer() # update observation buffer after each step
 
-        env_obs = {key: torch.tensor(value[-1]) for key, value in self.observation_buffer.items()}
+        env_obs = {key: torch.tensor(value[-1]).clone().detach() for key, value in self.observation_buffer.items()}
 
         reward = 0.0 # We do not use rewards, so we just set it to 0.0 
 
         # Terminate if the furniture is assembled or the time limit is reached
-        part_poses = {part: self.scene[part].data.root_state_w[0][:7].cpu().numpy() for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']}
-        terminated = furniture_assembly_check('lamp', part_poses)
+        terminated = self.check_success()
         self.time_step_counter += 1
         truncated = False
         if self.time_limit and self.time_step_counter > self.time_limit:
@@ -208,3 +228,4 @@ class AlohaLampEnv(ManagerBasedEnv):
         else:
             self.observation_buffer["action_vel_l"].append(torch.zeros(7))
             self.observation_buffer["action_vel_r"].append(torch.zeros(7))
+    

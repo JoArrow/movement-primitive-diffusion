@@ -23,7 +23,7 @@ class AlohaLampWorkspace(BaseWorkspace):
         
 
         # Launch the simulation app
-        app_launcher = AppLauncher(headless=True)
+        app_launcher = AppLauncher()#(headless=True)
         simulation_app = app_launcher.app
 
         
@@ -34,17 +34,17 @@ class AlohaLampWorkspace(BaseWorkspace):
                          show_images)
     
         
+    def render_function(self, caller_locals: dict) -> np.ndarray:
+        # Override this function to return an arbitrarz array.
+        # TODO: remove this function once we can actually render the simulation
+        return np.zeros((1, 1))
 
 
-    # TODO Adapt test_agent method, so we can setup AppLauncher etc to run the ManagerBasedEnv
     def test_agent(self, agent: BaseAgent, num_trajectories: int = 10) -> dict:
         self.num_successful_trajectories = 0
         self.num_failed_trajectories = 0
         frames_of_successful_trajectories = []
         frames_of_failed_trajectories = []
-
-
-
 
         for i in (pbar := tqdm(range(num_trajectories), desc="Testing agent", leave=False)):
             self.reset_env(caller_locals=locals())
@@ -52,7 +52,7 @@ class AlohaLampWorkspace(BaseWorkspace):
             done = False
             successful = False
             episode_frames = []
-            #image_shape = self.render_function(caller_locals=locals()).shape
+            image_shape = self.render_function(caller_locals=locals()).shape
 
             while not done:
                 observation_buffer = self.env.get_observation_dict()
@@ -122,8 +122,8 @@ class AlohaLampWorkspace(BaseWorkspace):
             frames_of_successful_trajectories.append(np.zeros(image_shape, dtype=np.uint8))
         if len(frames_of_failed_trajectories) == 0:
             frames_of_failed_trajectories.append(np.zeros(image_shape, dtype=np.uint8))
-        self.log_video(frames_of_successful_trajectories, fps=fps, metric="successful")
-        self.log_video(frames_of_failed_trajectories, fps=fps, metric="failed")
+        #self.log_video(frames_of_successful_trajectories, fps=fps, metric="successful")
+        #self.log_video(frames_of_failed_trajectories, fps=fps, metric="failed")
 
         return self.get_result_dict(caller_locals=locals())
 

@@ -95,7 +95,7 @@ class BaseWorkspace:
                     if done:
                         break
 
-            # Add frames of episode to buffer of successful or failed trajectories
+            # TODO Add frames of episode to buffer of successful or failed trajectories
             if successful:
                 if self.num_successful_trajectories < self.num_upload_successful_videos:
                     frames_of_successful_trajectories.extend(episode_frames)
@@ -126,7 +126,7 @@ class BaseWorkspace:
         For example for checking if the agent reached the goal.
 
         """
-        return caller_locals["terminated"]
+        return self.env.check_success()
 
     def reset_env(self, caller_locals: Dict) -> np.ndarray:
         """Function to modify reset behavior in subclasses.
