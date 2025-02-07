@@ -104,6 +104,7 @@ class AlohaLampEnv(ManagerBasedEnv):
                  ):
         
         env_cfg = AlohaEnvCfg(task='lamp', 
+                              event_type='domain_randomization',
                               dt = dt)  
         super().__init__(cfg=env_cfg)
 
