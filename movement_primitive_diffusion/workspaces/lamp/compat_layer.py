@@ -4,6 +4,7 @@
 #app_launcher = AppLauncher(headless=True)
 #simulation_app = app_launcher.app
 
+from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Optional, Union
 from collections import deque, defaultdict
 from functools import partial
@@ -20,14 +21,15 @@ from movement_primitive_diffusion.utils.helper import deque_to_array
 
 from .examples.aloha import BODY_JOINTS, EE_BODY, NUM_ENVS, RECORD
 from .examples.utils.furniture_utils import furniture_assembly_check
+from .examples.utils.furniture_utils import get_part_names
 from .examples.aloha_env_cfg import AlohaEnvCfg
 
 
 OPEN_THRESH = 1.0
 CLOSE_THRESH = 0.0
 
-START_ARM_POSE = [00, -0.96, 1.16, 0, -0.3, 0, 0.02239, -0.02239]
-START_ARM_VEL = [0, 0, 0, 0, 0, 0, 0, 0]
+START_ARM_POSE = [0.0, -0.96, 0.8, 0.0, -0.3, 0.0, 0.02239, -0.02239]
+START_ARM_VEL = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 class AlohaController:
     GRIPPER_FORCE = 25 
@@ -101,10 +103,11 @@ class AlohaLampEnv(ManagerBasedEnv):
                  num_upload_successful_videos: int = 0,
                  num_upload_failed_videos: int = 0,
                  show_images: bool = False,
+                 task = 'lamp'
                  ):
         
         env_cfg = AlohaEnvCfg(task='lamp', 
-                              event_type='domain_randomization',
+                              event_type='record',
                               dt = dt)  
         super().__init__(cfg=env_cfg)
 
@@ -113,9 +116,11 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.dt = dt
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
-        self.latest_action = None
-        self.latest_action_vel = None
+        self.latest_action: np.ndarray = None
+        self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
         self.time_step_counter: int = 0
+
+        self.task = task
 
         # Get the robot articulations
         self.robot_left: Articulation = self.scene["robot_left"]  
@@ -141,50 +146,129 @@ class AlohaLampEnv(ManagerBasedEnv):
                                                   torch.tensor(START_ARM_VEL))
 
         # reset environment
-        obs, info = super().reset() # TODO: rogodbodies are not reset and also not placed in new randomized positions
+        env_obs, info = super().reset()
+
+        # overwrite obs with custom function
+        env_obs = self.get_observation()
 
         # Fill observation buffer with initial values
         for _ in range(self.t_obs):
-            self.update_observation_buffer()
+            self.update_observation_buffer(env_obs)
 
-        return obs, info
-
-
-
-    def check_success(self):
-        part_poses = {part: self.scene[part].data.root_state_w[0][:7].cpu().numpy() for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']}
-        return furniture_assembly_check('lamp', part_poses)
+        return env_obs, info
 
 
 
-    def step(self, action):
-        self.latest_action = action
+    def check_success(self, 
+                      num_envs = 1,
+                      task = 'lamp') -> bool | list[bool]:
+        """
+        Check if the furniture is assembled.
+        Args:
+            num_envs (int): The number of environments.
+            task (str): The task being performed.
+        Returns:
+            bool or list: A boolean indicating whether the furniture is assembled in the single environment or a list of booleans indicating whether the furniture is assembled in each environment.
+        """
+        if num_envs == 1: # check if the furniture is assembled in the single environment
+            part_poses = {part: self.scene[part].data.root_state_w[0][:7].cpu().numpy() for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']}
+            return furniture_assembly_check(task, part_poses) # returns a boolean
+        
+        else: # check for each environment if the furniture is assembled.
+            part_poses = self.get_part_poses(num_envs=num_envs, task=task)
+            return self.is_assembled(part_poses, task=task) # returns a list of booleans
 
+
+    def get_part_poses(
+            self,
+            num_envs: int = 1,
+            task: str = 'lamp') -> dict:
+        """
+        Get the poses of the specified parts in the environment.
+        Args:
+            task (str): The task being performed.
+            part_names (list): A list of part names.
+        Returns:
+            dict: A dictionary containing the poses of the specified parts for all envs. The shape of each pose is (num_envs, 7).
+        """
+        part_names: list = get_part_names(task)
+        part_poses = {} # dictionary to store the poses of the parts. Keys are the part names, Values are poses of shape (num_envs, 7). 
+        for part in part_names:
+            part_poses[part] =torch.cat(
+                (self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
+                 self.scene[part].data.root_state_w[:,3:7]), dim=1)
+            for key, val in part_poses.items():
+                assert(val.shape[0] == num_envs)
+                assert(val.shape[1] == 7)
+        return part_poses
+
+
+    def is_assembled(part_poses: dict,
+                     task: str = 'lamp') -> List[bool]:
+        """
+        Check if the furniture is assembled.
+        Args:
+            part_poses (dict): A dictionary containing the poses of the parts. Keys are the part names, Values are poses of shape (num_envs, 7).
+            num_envs (int): The number of environments.
+            task (str): The task being performed.
+        Returns:
+            list: A list of booleans indicating whether the furniture is assembled in each environment.
+        """
+        result = []
+        # get the number of environments from the shape of the poses of the parts
+        num_envs = part_poses[0].shape[0]
+        for i in range(num_envs):
+            # get the poses of the parts for the i-th environment
+            poses_i = {key: values[i] for key, values in part_poses.items()} 
+            # check if the furniture is assembled in the i-th environment
+            result.append(furniture_assembly_check(task = task,  poses=poses_i)) 
+        assert(len(result) == num_envs)
+        return result
+
+
+    def step(self, action: np.ndarray):
+        self.time_step_counter += 1
+
+
+        # update the latest action and action velocity
+        if self.latest_action is not None:
+            self.latest_action_vel = (action - self.latest_action) / self.dt
+        self.latest_action = deepcopy(action)
+
+
+        # apply action to environment
         action_l = action[:7]
         action_r = action[7:]
-        assert(len(action_l) == len(action_r) == 7)
 
         self.controller_left.move_forward_kinematics(action_l)
         self.controller_right.move_forward_kinematics(action_r)
 
-        super().step(torch.cat((self.robot_left.data.joint_pos_target, 
-                                self.robot_right.data.joint_pos_target), 1))
+        _, info = super().step(torch.cat((self.robot_left.data.joint_pos_target, 
+                                          self.robot_right.data.joint_pos_target), 1))
 
-        self.update_observation_buffer() # update observation buffer after each step
 
-        env_obs = {key: torch.tensor(value[-1]).clone().detach() for key, value in self.observation_buffer.items()}
+        # get observation and update observation buffer
+        env_obs = self.get_observation()
+        self.update_observation_buffer(env_obs)
 
-        reward = 0.0 # We do not use rewards, so we just set it to 0.0 
+
+        # TODO: We do not use rewards, so we just set it to 0.0 
+        reward = 0.0 
+
 
         # Terminate if the furniture is assembled or the time limit is reached
         terminated = self.check_success()
-        self.time_step_counter += 1
         truncated = False
         if self.time_limit and self.time_step_counter > self.time_limit:
             terminated = True
             truncated = True
 
-        info: dict[str, Any] = {}
+
+        # Create emtpy info
+        #info: dict[str, Any] = {}
+
+        # assert(len(env_obs) == len(self.observation_buffer))
+        # assert(env_obs.keys() == self.observation_buffer.keys())
 
         return env_obs, reward, terminated, truncated, info
 
@@ -198,35 +282,49 @@ class AlohaLampEnv(ManagerBasedEnv):
         return deque_to_array(self.observation_buffer, add_batch_dim=add_batch_dim)
 
 
-    def update_observation_buffer(self) -> None:
+
+    def update_observation_buffer(self, env_obs: dict[str, torch.Tensor]) -> None:
         """
         Updates the observation buffer with the latest observations, agent state, and action information.
         """
-        # lamp parts
-        for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:   
-            self.observation_buffer[part].append(torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
-                                                 self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze())
+        for key, val in env_obs.items():
+            self.observation_buffer[key].append(val)
+        
+        # # Assert that each value of observation_buffer contains the same number of elements
+        # num_elements = len(self.observation_buffer[key])
+        # for key, val in self.observation_buffer.items():
+        #     assert len(val) == num_elements
+
+
+
+    def get_observation(self) -> dict[str, torch.Tensor]:
+        """
+        Returns the current observation as a dictionary of torch tensors.
+        """
+        env_obs: dict[str, torch.Tensor] = {}
+
+        for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:
+            env_obs[part] = torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
+                                       self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
         
         # agent state. Position and velocity of the agent
-        self.observation_buffer["agent_pos_l"].append(self.scene['robot_left'].data.joint_pos.cpu().squeeze())
-        self.observation_buffer["agent_pos_r"].append(self.scene['robot_right'].data.joint_pos.cpu().squeeze())
+        env_obs["agent_pos_l"] = self.scene['robot_left'].data.joint_pos.cpu().squeeze()
+        env_obs["agent_pos_r"] = self.scene['robot_right'].data.joint_pos.cpu().squeeze()
 
-        self.observation_buffer["agent_vel_l"].append(self.scene['robot_left'].data.joint_vel.cpu().squeeze())
-        self.observation_buffer["agent_vel_r"].append(self.scene['robot_right'].data.joint_vel.cpu().squeeze())
+        env_obs["agent_vel_l"] = self.scene['robot_left'].data.joint_vel.cpu().squeeze()
+        env_obs["agent_vel_r"] = self.scene['robot_right'].data.joint_vel.cpu().squeeze()
 
-
-        if self.latest_action is not None:
-            self.observation_buffer["action_l"].append(self.latest_action[:7])
-            self.observation_buffer["action_r"].append(self.latest_action[7:])
+        if self.latest_action is None:
+            # if the latest action is None, we set it to the agent position and set the action velocity to the agent velocity
+            # only copy the first 7 values, the last value is not used for actions (because gripper fingers act the same)
+            env_obs["action_l"] = env_obs["agent_pos_l"][:7].numpy()
+            env_obs["action_r"] = env_obs["agent_pos_r"][:7].numpy()
+            env_obs["action_vel_l"] = env_obs["agent_vel_l"][:7].numpy()
+            env_obs["action_vel_r"] = env_obs["agent_vel_r"][:7].numpy()
         else:
-            self.observation_buffer["action_l"].append(torch.zeros(7))
-            self.observation_buffer["action_r"].append(torch.zeros(7))
-        
+            env_obs["action_l"] = self.latest_action[:7]
+            env_obs["action_r"] = self.latest_action[7:]
+            env_obs["action_vel_l"] = self.latest_action_vel[:7]
+            env_obs["action_vel_r"] = self.latest_action_vel[7:]
 
-        if self.latest_action_vel is not None:
-            self.observation_buffer["action_vel_l"].append(self.latest_action_vel[:7])
-            self.observation_buffer["action_vel_r"].append(self.latest_action_vel[7:])
-        else:
-            self.observation_buffer["action_vel_l"].append(torch.zeros(7))
-            self.observation_buffer["action_vel_r"].append(torch.zeros(7))
-    
+        return env_obs    
