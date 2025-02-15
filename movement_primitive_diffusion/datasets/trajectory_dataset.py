@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pickle
 import re
@@ -268,6 +269,37 @@ class TrajectoryDataset(Dataset):
                 image_transform_list.append(transforms.CenterCrop(crop_size))
 
         return transforms.Compose(image_transform_list), image_shape
+
+    def get_trajectories(self, n_handmades: int, n_generated: int) -> List[str]:
+        """ Get list of trajector a specified number of handemade and generated trajectories.
+        """
+        trajectory_dirs = []
+        handmade_demo_dirs = []
+        gen_demo_dirs = []
+        
+        # randomly choose n_handmades handmade demos
+        handmade_demo_dirs = [dir for dir in self.trajectory_dirs if not 'randomized' in dir.name]
+        handmade_demo_dirs = random.sample(handmade_demo_dirs, n_handmades)
+        
+        # get all generated demos for the previously selected handmade demos
+        for handmade_demo in handmade_demo_dirs:
+            gen_run_dirs = [dir for dir in self.trajectory_dirs if dir.name.startswith(handmade_demo.name) and 'randomized' in dir.name]
+            for gen_run_dir in gen_run_dirs:
+                gen_demo_dirs.append([folder for folder in gen_run_dir.iterdir() if folder.is_dir()])
+                
+        # randomly choose n_generated generated demos
+        gen_demo_dirs = random.sample(gen_demo_dirs, n_generated)
+
+        # append the selected handmade and generated demos to the trajectory_dirs list
+        trajectory_dirs.append(handmade_demo_dirs)
+        trajectory_dirs.append(gen_demo_dirs)
+        
+        assert(len(handmade_demo_dirs) == n_handmades), f"Number of selected handmade trajectories does not match the specified number of handmade trajectories."
+        assert(len(gen_demo_dirs) == n_generated), f"Number of selected generated trajectories does not match the specified number of generated trajectories."
+        assert(len(trajectory_dirs) == n_handmades + n_generated), f"Number of selected trajectories does not match the sum of the selected handmade and generated trajectories."
+
+        return trajectory_dirs
+
 
     def __load_trajectories(self) -> None:
         # Load numpy arrays for all trajectories
