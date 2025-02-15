@@ -28,15 +28,15 @@ network_configs:
     network_config:
       _target_: movement_primitive_diffusion.networks.layers.PassThrough
   
-  # Robot arm velocities
-  - observation_key: agent_vel_l
-    feature_size: null # set in python based on dataset
-    network_config:
-      _target_: movement_primitive_diffusion.networks.layers.PassThrough
-  - observation_key: agent_vel_r
-    feature_size: null # set in python based on dataset
-    network_config:
-      _target_: movement_primitive_diffusion.networks.layers.PassThrough
+  # # Robot arm velocities
+  # - observation_key: agent_vel_l
+  #   feature_size: null # set in python based on dataset
+  #   network_config:
+  #     _target_: movement_primitive_diffusion.networks.layers.PassThrough
+  # - observation_key: agent_vel_r
+  #   feature_size: null # set in python based on dataset
+  #   network_config:
+  #     _target_: movement_primitive_diffusion.networks.layers.PassThrough
 
 
 aggregator_config:
