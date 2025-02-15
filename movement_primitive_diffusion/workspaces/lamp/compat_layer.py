@@ -28,7 +28,7 @@ from .examples.aloha_env_cfg import AlohaEnvCfg
 OPEN_THRESH = 1.0
 CLOSE_THRESH = 0.0
 
-START_ARM_POSE = [0.0, -0.96, 0.8, 0.0, -0.3, 0.0, 0.02239, -0.02239]
+START_ARM_POSE = [0, -0.96, 0.8, 0, -0.3, 0, 0.02239, -0.02239]
 START_ARM_VEL = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 class AlohaController:
@@ -139,14 +139,14 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.controller_left.reset()  
         self.controller_right.reset()
 
+        # reset environment
+        env_obs, info = super().reset()
+
         # Beaming to start position and velocity
         self.controller_left.set_robot_joint_pos(torch.tensor(START_ARM_POSE), 
                                                  torch.tensor(START_ARM_VEL))
         self.controller_right.set_robot_joint_pos(torch.tensor(START_ARM_POSE),
                                                   torch.tensor(START_ARM_VEL))
-
-        # reset environment
-        env_obs, info = super().reset()
 
         # overwrite obs with custom function
         env_obs = self.get_observation()
