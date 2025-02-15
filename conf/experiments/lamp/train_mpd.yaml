@@ -32,10 +32,10 @@ data_loader_config:
   num_workers: 0 # TODO: cannot change num_workers
   batch_size: 256
 
-epochs: 2 # 3000
+epochs: 1500 # 3000
 early_stopping: False
-eval_in_env_after_epochs: 2 # 9999
-num_trajectories_in_env: 1 # 100
+eval_in_env_after_epochs: 9999 # 9999
+num_trajectories_in_env: 10 # 100
 save_distance: 100 # additionally to the best model, save model every n epochs
 
 group_from_overrides: False

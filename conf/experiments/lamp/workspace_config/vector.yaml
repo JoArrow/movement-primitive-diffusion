@@ -1,7 +1,18 @@
-_target_: movement_primitive_diffusion.workspaces.lamp.lamp_workspace.AlohaLampWorkspace
+_target_: movement_primitive_diffusion.workspaces.lamp.lamp_vector_workspace.AlohaLampWorkspace
 _recursive_: False
 
 t_act: ${t_act}
+
+num_parallel_envs: 12
+shared_memory: False
+
+num_upload_successful_videos: 5
+num_upload_failed_videos: 5
+
+video_dt: ${dataset_config.dt}
+show_images: False
+annotate_videos: False
+timeout: None
 
 env_config:
   _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
@@ -12,7 +23,7 @@ env_config:
 
   t_obs: ${t_obs}
   dt: 0.005555556
-  time_limit: 20000 #time limit in frames
+  time_limit: 500
 
 
   num_upload_successful_videos: 0

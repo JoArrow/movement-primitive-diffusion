@@ -1,5 +1,5 @@
-config: ???
-weights: ???
+config: wandb/latest-run/files/config.yaml
+weights: wandb/latest-run/files/best_model.pth
 # For example:
 # config: wandb/latest-run/files/config.yaml
 # weights: wandb/latest-run/files/best_model.pth
