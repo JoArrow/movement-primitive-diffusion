@@ -10,9 +10,9 @@ relative_action_values: False  # <- can be used to create actions sequences that
 # Note: the order matters here, because the action keys are concatenated
 action_keys:
   - key: action_l
-    feature_size: null # set in python based on 
-  - key: action_r
     feature_size: null # set in python based on dataset
+  - key: action_r
+    feature_size: null
 
 
 initial_values_come_from_action_data: True  # <- if time_series_a.npz stores action values,
@@ -20,5 +20,7 @@ initial_values_come_from_action_data: True  # <- if time_series_a.npz stores act
 initial_position_keys: # <- used by the ProDMP to set the initial values of the action sequence
   - action_l
   - action_r
+initial_velocity_keys: 
+  - action_vel_l
+  - action_vel_r
 observation_keys: null # set in python based on encoder
-initial_velocity_keys: [action_vel_l, action_vel_r]
