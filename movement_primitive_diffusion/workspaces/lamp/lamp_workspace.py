@@ -1,4 +1,5 @@
 from omegaconf import DictConfig
+import hydra
 
 from movement_primitive_diffusion.workspaces.base_workspace import BaseWorkspace
 
@@ -23,9 +24,10 @@ class AlohaLampWorkspace(BaseWorkspace):
         
 
         # Launch the simulation app
-        app_launcher = AppLauncher()#(headless=True)
+        app_launcher = AppLauncher()# (headless=True)
         simulation_app = app_launcher.app
 
+        self.env_config = env_config
         
         super().__init__(env_config, 
                          t_act,
@@ -35,10 +37,18 @@ class AlohaLampWorkspace(BaseWorkspace):
     
         
     def render_function(self, caller_locals: dict) -> np.ndarray:
-        # Override this function to return an arbitrarz array.
+        # Override this function to return an arbitrary array.
         # TODO: remove this function once we can actually render the simulation
         return np.zeros((1, 1))
 
+    def reset_env(self, caller_locals: dict) -> np.ndarray:
+        """Function to modify reset behavior in subclasses.
+
+        For example for setting a random seed, or passing an options dict.
+
+        """
+
+        return self.env.reset()
 
     def test_agent(self, agent: BaseAgent, num_trajectories: int = 10) -> dict:
         self.num_successful_trajectories = 0

@@ -103,17 +103,20 @@ class AlohaLampEnv(ManagerBasedEnv):
                  num_upload_successful_videos: int = 0,
                  num_upload_failed_videos: int = 0,
                  show_images: bool = False,
-                 task = 'lamp'
+                 task = 'lamp',
+                 num_envs = 1,
                  ):
         
         env_cfg = AlohaEnvCfg(task='lamp', 
                               event_type='record',
-                              dt = dt)  
+                              dt = dt,
+                              num_envs = num_envs,)  
         super().__init__(cfg=env_cfg)
 
         self.t_obs = t_obs
         self.time_limit = time_limit
         self.dt = dt
+        self.num_envs = num_envs
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
         self.latest_action: np.ndarray = None
@@ -159,8 +162,7 @@ class AlohaLampEnv(ManagerBasedEnv):
 
 
 
-    def check_success(self, 
-                      num_envs = 1,
+    def check_success(self,
                       task = 'lamp') -> bool | list[bool]:
         """
         Check if the furniture is assembled.
@@ -170,18 +172,17 @@ class AlohaLampEnv(ManagerBasedEnv):
         Returns:
             bool or list: A boolean indicating whether the furniture is assembled in the single environment or a list of booleans indicating whether the furniture is assembled in each environment.
         """
-        if num_envs == 1: # check if the furniture is assembled in the single environment
+        if self.num_envs == 1: # check if the furniture is assembled in the single environment
             part_poses = {part: self.scene[part].data.root_state_w[0][:7].cpu().numpy() for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']}
             return furniture_assembly_check(task, part_poses) # returns a boolean
         
         else: # check for each environment if the furniture is assembled.
-            part_poses = self.get_part_poses(num_envs=num_envs, task=task)
-            return self.is_assembled(part_poses, task=task) # returns a list of booleans
+            part_poses = self.get_part_poses(num_envs=self.num_envs, task=task)
+            return self.are_envs_assembled(part_poses, task=task) # returns a list of booleans
 
 
     def get_part_poses(
             self,
-            num_envs: int = 1,
             task: str = 'lamp') -> dict:
         """
         Get the poses of the specified parts in the environment.
@@ -198,13 +199,14 @@ class AlohaLampEnv(ManagerBasedEnv):
                 (self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
                  self.scene[part].data.root_state_w[:,3:7]), dim=1)
             for key, val in part_poses.items():
-                assert(val.shape[0] == num_envs)
+                assert(val.shape[0] == self.num_envs)
                 assert(val.shape[1] == 7)
         return part_poses
 
 
-    def is_assembled(part_poses: dict,
-                     task: str = 'lamp') -> List[bool]:
+    def are_envs_assembled(self,
+                           part_poses: dict,
+                           task: str = 'lamp') -> List[bool]:
         """
         Check if the furniture is assembled.
         Args:
@@ -215,14 +217,14 @@ class AlohaLampEnv(ManagerBasedEnv):
             list: A list of booleans indicating whether the furniture is assembled in each environment.
         """
         result = []
-        # get the number of environments from the shape of the poses of the parts
-        num_envs = part_poses[0].shape[0]
-        for i in range(num_envs):
+        assert(self.num_envs == part_poses[0].shape[0])
+
+        for i in range(self.num_envs):
             # get the poses of the parts for the i-th environment
             poses_i = {key: values[i] for key, values in part_poses.items()} 
             # check if the furniture is assembled in the i-th environment
             result.append(furniture_assembly_check(task = task,  poses=poses_i)) 
-        assert(len(result) == num_envs)
+        assert(len(result) == self.num_envs)
         return result
 
 
