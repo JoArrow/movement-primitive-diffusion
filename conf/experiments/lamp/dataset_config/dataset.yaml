@@ -15,8 +15,11 @@ keys:
   - lamp_hood
 dt: 0.005555556 # 1/180 What is the time difference between each value in the time series? e.g. 0.1
 target_dt: null # <- Optional resampling of your time series
-normalize_keys: [] # <- which of the keys should be normalized? (scaled to an interval)
-#  - time_series_a
+normalize_keys:  # <- which of the keys should be normalized? (scaled to an interval)
+  - action_l
+  - action_r
+  - agent_pos_l
+  - agent_pos_r
 normalize_symmetrically: True # False: normalized to [0, 1] instead of [-1, 1]
 standardize_keys: [] # <- which of the keys should be standardized? (zero mean, std of 1)
 #  - time_series_b
@@ -25,34 +28,29 @@ scaler_values:
       min: null # <- will be calculated in the dataset
       max: null
     action_r:
-      mean: null
-      std: null
+      min: null
+      max: null
     agent_pos_l:
-      mean: null
-      std: null
+      min: null
+      max: null
     agent_pos_r:
-      mean: null
-      std: null
-    agent_vel_l:
-      mean: null
-      std: null
-    agent_vel_r:
-      mean: null
-      std: null
-    lamp_base:
-      mean: null
-      std: null
-    lamp_bulp:
-      mean: null
-      std: null
-    lamp_hood:
-      mean: null
-      std: null
-recalculate_velocities_from_to: [] # <- if you normalize position values, the velocity values will not match anymore (0 velocity before scaling might not be 0 velocity after scaling)
- # <- calculate time_series_c (let's say these are joint velocities) from the normalized values of time_series_a using dt
+      min: null
+      max: null
+
+
 calculate_velocities_from_to:  # dataset does not have action_velocities -> calculate
+  - [agent_pos_l, agent_vel_l]
+  - [agent_pos_r, agent_vel_r]
   - [action_l, action_vel_l]
-  - [action_r, action_vel_r]
+  - [action_r, action_vel_r] 
+
+recalculate_velocities_from_to: # <- if you normalize position values, the velocity values will not match anymore (0 velocity before scaling might not be 0 velocity after scaling)
+  - [agent_pos_l, agent_vel_l]
+  - [agent_pos_r, agent_vel_r]
+  - [action_l, action_vel_l]
+  - [action_r, action_vel_r] 
+
+
 image_keys: []
 image_sizes: []
 crop_sizes: []
