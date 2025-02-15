@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - workspace_config: single  # TODO This will use a dummy workspace that does not contain an environment for evaluation of the trained agent. See below for more information about workspaces.
+  - workspace_config: dummy  # single, dummy or  vector
   - dataset_config: dataset
   - /agent_config: prodmp_transformer_agent  # <- this is defined in ./conf/agent_config/prodmp_transformer_agent.yaml
   - process_batch_config: prodmp
@@ -29,13 +29,13 @@ val_trajectory_dir: null
 data_loader_config:
   shuffle: True
   pin_memory: False
-  num_workers: 0
+  num_workers: 0 # TODO: cannot change num_workers
   batch_size: 256
 
-epochs: 3000
+epochs: 2 # 3000
 early_stopping: False
-eval_in_env_after_epochs: 9999
-num_trajectories_in_env: 100
+eval_in_env_after_epochs: 2 # 9999
+num_trajectories_in_env: 1 # 100
 save_distance: 100 # additionally to the best model, save model every n epochs
 
 group_from_overrides: False
