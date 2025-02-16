@@ -125,6 +125,8 @@ class AlohaLampEnv(ManagerBasedEnv):
         #self.num_envs = num_envs
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
+        self.previous_agent_l_pos_norm = None
+        self.previous_agent_r_pos_norm = None
         self.latest_action: np.ndarray = None
         self.latest_action_norm: np.ndarray = None
         self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
@@ -173,10 +175,12 @@ class AlohaLampEnv(ManagerBasedEnv):
         # reset step counter
         self.time_step_counter = 0
 
+        self.observation_buffer = None
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
         self.latest_action: np.ndarray = None
         self.latest_action_norm: np.ndarray = None
         self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
+        self.latest_action_vel_norm: np.ndarray  = None
         self.time_step_counter: int = 0
 
         # Reset robot controller
@@ -184,7 +188,7 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.controller_right.reset()
 
         # reset environment
-        env_obs, info = super().reset()
+        _, info = super().reset()
 
         # Beaming to start position and velocity
         self.controller_left.set_robot_joint_pos(torch.tensor(START_ARM_POSE), 
@@ -234,7 +238,7 @@ class AlohaLampEnv(ManagerBasedEnv):
             action_copy[13] = np.clip(action_copy[13], 
                                       self.scaler_values['action_r']['min'][6], 
                                       self.scaler_values['action_r']['max'][6])
-            action_copy[7:13] = np.clip(action_copy[:6], 
+            action_copy[7:13] = np.clip(action_copy[7:13], 
                                       np.tile([-np.pi], 6), 
                                       np.tile([np.pi], 6))
         return action_copy
@@ -308,6 +312,9 @@ class AlohaLampEnv(ManagerBasedEnv):
 
     def step(self, action_norm: np.ndarray):
         self.time_step_counter += 1
+
+        self.previous_agent_l_pos = self.scene['robot_left'].data.joint_pos.cpu().squeeze()
+        self.previous_agent_r_pos = self.scene['robot_right'].data.joint_pos.cpu().squeeze()
 
         if self.latest_action_norm is not None:
             self.latest_action_vel_norm = (action_norm - self.latest_action_norm) / self.dt
@@ -386,37 +393,69 @@ class AlohaLampEnv(ManagerBasedEnv):
         return normalize(np.array(value), self.scaler_values[key], self.normalize_symmetrically)
 
     def get_observation(self) -> dict[str, torch.Tensor]:
+
         """
         Returns the normalized current observation as a dictionary of torch tensors.
         """
         env_obs: dict[str, torch.Tensor] = {}
 
         for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:
-            env_obs[part] = torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
-                                       self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
+            env_obs[part] =self.scene[part].data.root_state_w[:,:7].cpu().squeeze()
+            
+            
+            if part is 'lamp_hood': print(env_obs[part])
+            
+            # torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
+            #                            self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
         
+
+
         # agent state. Position and velocity of the agent
-        env_obs["agent_pos_l"] = self.scene['robot_left'].data.joint_pos.cpu().squeeze()
-        env_obs["agent_pos_r"] = self.scene['robot_right'].data.joint_pos.cpu().squeeze()
+        env_obs["agent_pos_l"] =   self.get_normalized_value(self.scene['robot_left'].data.joint_pos.cpu().squeeze(), "agent_pos_l") 
+        env_obs["agent_pos_r"] =   self.get_normalized_value(self.scene['robot_right'].data.joint_pos.cpu().squeeze(), "agent_pos_r")
+        # env_obs["agent_vel_l"] = self.scene['robot_left'].data.joint_vel.cpu().squeeze()
+        # env_obs["agent_vel_r"] = self.scene['robot_right'].data.joint_vel.cpu().squeeze()
 
-        env_obs["agent_vel_l"] = self.scene['robot_left'].data.joint_vel.cpu().squeeze()
-        env_obs["agent_vel_r"] = self.scene['robot_right'].data.joint_vel.cpu().squeeze()
 
-        if self.latest_action is None:
+        # compute normalized velocities
+        if self.previous_agent_l_pos_norm and self.previous_agent_r_pos_norm:
+            env_obs["agent_vel_l"] = (env_obs["agent_pos_l"] - self.previous_agent_l_pos_norm) / self.dt
+            env_obs["agent_vel_r"] = (env_obs["agent_pos_r"] - self.previous_agent_r_pos_norm) / self.dt
+
+            self.previous_agent_l_pos_norm = env_obs["agent_pos_l"]
+            self.previous_agent_r_pos_norm  = env_obs["agent_pos_r"]
+        else:
+            env_obs["agent_vel_l"] = np.array(START_ARM_VEL)
+            env_obs["agent_vel_r"] = np.array(START_ARM_VEL)
+
+        if  self.latest_action_norm is not None:
             # if the latest action is None, we set it to the agent position and set the action velocity to the agent velocity
             # only copy the first 7 values, the last value is not used for actions (because gripper fingers act the same)
-            env_obs["action_l"] = env_obs["agent_pos_l"][:7].numpy()
-            env_obs["action_r"] = env_obs["agent_pos_r"][:7].numpy()
-            env_obs["action_vel_l"] = env_obs["agent_vel_l"][:7].numpy()
-            env_obs["action_vel_r"] = env_obs["agent_vel_r"][:7].numpy()
+            env_obs["action_l"] = self.latest_action_norm[:7]
+            env_obs["action_r"] = self.latest_action_norm[7:]
         else:
-            env_obs["action_l"] = self.latest_action[:7]
-            env_obs["action_r"] = self.latest_action[7:]
-            env_obs["action_vel_l"] = self.latest_action_vel[:7]
-            env_obs["action_vel_r"] = self.latest_action_vel[7:]
+            env_obs["action_l"] = np.array(env_obs["agent_pos_l"][:7])
+            env_obs["action_r"] = np.array(env_obs["agent_pos_r"][:7])
 
-        for key, val in env_obs.items():
-            if key in self.normalize_keys:
-                env_obs[key] = self.get_normalized_value(val, key)
+
+        if self.latest_action_vel_norm is not None:
+            env_obs["action_vel_l"] = self.latest_action_vel_norm[:7]
+            env_obs["action_vel_r"] = self.latest_action_vel_norm[7:]
+        else:
+            env_obs["action_vel_l"] = np.array(env_obs["agent_vel_l"][:7])
+            env_obs["action_vel_r"] = np.array(env_obs["agent_vel_r"][:7])
+
+        #TODO just swaped the lastest action and velocity to norm 
+
+
+        assert(env_obs["action_l"].shape == (7,))
+        assert(env_obs["action_vel_l"].shape == (7,))
+        assert(env_obs["action_r"].shape == (7,))
+        assert(env_obs["action_vel_r"].shape == (7,))
+        assert(env_obs["agent_pos_l"].shape == (8,))
+        assert(env_obs["agent_vel_l"].shape == (8,))
+        assert(env_obs["agent_pos_r"].shape == (8,))
+        assert(env_obs["agent_vel_r"].shape == (8,))
+        
 
         return env_obs    
