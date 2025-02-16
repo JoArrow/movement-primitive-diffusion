@@ -8,7 +8,7 @@ from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Optional, Union
 from collections import deque, defaultdict
 from functools import partial
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 import torch
 import numpy as np
 
@@ -18,6 +18,12 @@ from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.utils.math import subtract_frame_transforms
 
 from movement_primitive_diffusion.utils.helper import deque_to_array
+from movement_primitive_diffusion.datasets.scalers import (
+    denormalize,
+    destandardize,
+    normalize,
+    standardize,
+)
 
 from .examples.aloha import BODY_JOINTS, EE_BODY, NUM_ENVS, RECORD
 from .examples.utils.furniture_utils import furniture_assembly_check
@@ -109,21 +115,50 @@ class AlohaLampEnv(ManagerBasedEnv):
         
         env_cfg = AlohaEnvCfg(task='lamp', 
                               event_type='record',
-                              dt = dt,
-                              num_envs = num_envs,)  
+                              dt = dt,)
+                              #num_envs = num_envs,)  
         super().__init__(cfg=env_cfg)
 
         self.t_obs = t_obs
         self.time_limit = time_limit
         self.dt = dt
-        self.num_envs = num_envs
+        #self.num_envs = num_envs
         
         self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
         self.latest_action: np.ndarray = None
+        self.latest_action_norm: np.ndarray = None
         self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
         self.time_step_counter: int = 0
 
         self.task = task
+
+        # SCALING AND NORMALIZATION
+        scaler_config = OmegaConf.to_container(scaler_config, resolve=True)
+        print(scaler_config)
+        self.normalize_keys: list[str] = scaler_config.get("normalize_keys", [])
+        self.standardize_keys: list[str] = scaler_config.get("standardize_keys", [])
+        self.normalize_symmetrically: bool = scaler_config["normalize_symmetrically"]
+        self.scaler_values: dict[str, dict[str, np.ndarray]] = scaler_config.get(
+            "scaler_values", {}
+        )
+
+        for key in self.normalize_keys:
+            assert key in self.scaler_values, f"Key {key} not found in scaler values."
+            for metric in ["min", "max"]:
+                assert (
+                    metric in self.scaler_values[key]
+                    and self.scaler_values[key][metric] is not None
+                ), f"Key {key} does not have {metric} in scaler values."
+                self.scaler_values[key][metric] = np.array(self.scaler_values[key][metric], dtype=np.float32)
+
+        for key in self.standardize_keys:
+            assert key in self.scaler_values, f"Key {key} not found in scaler values."
+            for metric in ["mean", "std"]:
+                assert (
+                    metric in self.scaler_values[key]
+                    and self.scaler_values[key][metric] is not None
+                ), f"Key {key} does not have {metric} in scaler values."
+                self.scaler_values[key][metric] = np.array(self.scaler_values[key][metric], dtype=np.float32)
 
         # Get the robot articulations
         self.robot_left: Articulation = self.scene["robot_left"]  
@@ -138,6 +173,12 @@ class AlohaLampEnv(ManagerBasedEnv):
         # reset step counter
         self.time_step_counter = 0
 
+        self.observation_buffer = defaultdict(partial(deque, maxlen=self.t_obs))
+        self.latest_action: np.ndarray = None
+        self.latest_action_norm: np.ndarray = None
+        self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
+        self.time_step_counter: int = 0
+
         # Reset robot controller
         self.controller_left.reset()  
         self.controller_right.reset()
@@ -151,7 +192,6 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.controller_right.set_robot_joint_pos(torch.tensor(START_ARM_POSE),
                                                   torch.tensor(START_ARM_VEL))
 
-        # overwrite obs with custom function
         env_obs = self.get_observation()
 
         # Fill observation buffer with initial values
@@ -160,6 +200,44 @@ class AlohaLampEnv(ManagerBasedEnv):
 
         return env_obs, info
 
+
+    def denormalize_destandardize_actions(self, action: np.ndarray) -> np.ndarray:
+        assert isinstance(action, np.ndarray), "action must be a numpy array"
+        # action consists of action_l and action_r
+        action_copy = deepcopy(action)
+        # denormalize
+        if (key := "action_l") in self.normalize_keys:
+            action_copy[:7] = denormalize(action_copy[:7], 
+                                          self.scaler_values[key], 
+                                          symmetric=self.normalize_symmetrically)
+        if (key := "action_r") in self.normalize_keys:
+            action_copy[7:] = denormalize(action_copy[7:], 
+                                          self.scaler_values[key], 
+                                          symmetric=self.normalize_symmetrically)
+        # destandardize
+        if (key := "action_l") in self.standardize_keys:
+            action_copy[:7] = destandardize(action_copy[:7], 
+                                            self.scaler_values[key])
+        if (key := "action_r") in self.standardize_keys:
+            action_copy[7:] = destandardize(action_copy[7:], 
+                                            self.scaler_values[key])
+        
+        # clip the action values
+        if 'action_l' in self.scaler_values:
+            action_copy[6] = np.clip(action_copy[6], 
+                                      self.scaler_values['action_l']['min'][6], 
+                                      self.scaler_values['action_l']['max'][6])
+            action_copy[:6] = np.clip(action_copy[:6], 
+                                      np.tile([-np.pi], 6), 
+                                      np.tile([np.pi], 6))
+        if 'action_r' in self.scaler_values:
+            action_copy[13] = np.clip(action_copy[13], 
+                                      self.scaler_values['action_r']['min'][6], 
+                                      self.scaler_values['action_r']['max'][6])
+            action_copy[7:13] = np.clip(action_copy[:6], 
+                                      np.tile([-np.pi], 6), 
+                                      np.tile([np.pi], 6))
+        return action_copy
 
 
     def check_success(self,
@@ -228,17 +306,24 @@ class AlohaLampEnv(ManagerBasedEnv):
         return result
 
 
-    def step(self, action: np.ndarray):
+    def step(self, action_norm: np.ndarray):
         self.time_step_counter += 1
 
+        if self.latest_action_norm is not None:
+            self.latest_action_vel_norm = (action_norm - self.latest_action_norm) / self.dt
+        self.latest_action_norm = action_norm
 
-        # update the latest action and action velocity
+        # denormalize and destandardize actions
+        action = self.denormalize_destandardize_actions(action_norm)
+
+        # compute action velocity
         if self.latest_action is not None:
             self.latest_action_vel = (action - self.latest_action) / self.dt
+        else:
+            self.latest_action_vel = np.zeros(action.shape, dtype=np.float32)
         self.latest_action = deepcopy(action)
 
-
-        # apply action to environment
+        # execute action
         action_l = action[:7]
         action_r = action[7:]
 
@@ -250,7 +335,7 @@ class AlohaLampEnv(ManagerBasedEnv):
 
 
         # get observation and update observation buffer
-        env_obs = self.get_observation()
+        env_obs = self.get_observation() # get normalized observation of current frame
         self.update_observation_buffer(env_obs)
 
 
@@ -260,10 +345,9 @@ class AlohaLampEnv(ManagerBasedEnv):
 
         # Terminate if the furniture is assembled or the time limit is reached
         terminated = self.check_success()
-        truncated = False
-        if self.time_limit and self.time_step_counter > self.time_limit:
-            terminated = True
-            truncated = True
+        
+        truncated = self.time_limit and self.time_step_counter > self.time_limit
+
 
 
         # Create emtpy info
@@ -297,11 +381,13 @@ class AlohaLampEnv(ManagerBasedEnv):
         # for key, val in self.observation_buffer.items():
         #     assert len(val) == num_elements
 
-
+    def get_normalized_value(self, value: np.ndarray | torch.Tensor, key: str) -> np.ndarray:
+        assert(key in self.normalize_keys)
+        return normalize(np.array(value), self.scaler_values[key], self.normalize_symmetrically)
 
     def get_observation(self) -> dict[str, torch.Tensor]:
         """
-        Returns the current observation as a dictionary of torch tensors.
+        Returns the normalized current observation as a dictionary of torch tensors.
         """
         env_obs: dict[str, torch.Tensor] = {}
 
@@ -328,5 +414,9 @@ class AlohaLampEnv(ManagerBasedEnv):
             env_obs["action_r"] = self.latest_action[7:]
             env_obs["action_vel_l"] = self.latest_action_vel[:7]
             env_obs["action_vel_r"] = self.latest_action_vel[7:]
+
+        for key, val in env_obs.items():
+            if key in self.normalize_keys:
+                env_obs[key] = self.get_normalized_value(val, key)
 
         return env_obs    

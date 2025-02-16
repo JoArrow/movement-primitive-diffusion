@@ -3,7 +3,7 @@ _recursive_: False
 
 t_act: ${t_act}
 
-num_parallel_envs: 12
+num_parallel_envs: 9
 shared_memory: False
 
 num_upload_successful_videos: 5
@@ -19,11 +19,14 @@ env_config:
   _recursive_: False
 
   scaler_config:
-    scaler_values: null
+    normalize_keys: ${dataset_config.normalize_keys}
+    normalize_symmetrically: ${dataset_config.normalize_symmetrically}
+    standardize_keys: ${dataset_config.standardize_keys}
+    scaler_values:  null # set in python based on dataset
 
   t_obs: ${t_obs}
   dt: 0.005555556
-  time_limit: 500
+  time_limit: 1300
 
 
   num_upload_successful_videos: 0

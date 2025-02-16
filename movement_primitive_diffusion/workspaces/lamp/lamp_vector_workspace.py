@@ -56,7 +56,7 @@ class AlohaLampWorkspace():
         )
 
         # Launch the simulation app
-        app_launcher = AppLauncher()#(headless=True)
+        app_launcher = AppLauncher(headless=True)
         simulation_app = app_launcher.app
 
         
