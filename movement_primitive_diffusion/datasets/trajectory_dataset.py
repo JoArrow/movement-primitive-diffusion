@@ -339,8 +339,10 @@ class TrajectoryDataset(Dataset):
         # Validate that all contents of the trajectories have the same length and save the lengths.
         for trajectory in self.trajectories:
             for key in trajectory.keys():
+                trajectory[key] = trajectory[key][:len(trajectory[list(trajectory.keys())[0]])]
                 if len(trajectory[key]) != len(trajectory[list(trajectory.keys())[0]]):
-                    raise RuntimeError(f"Trajectory {trajectory} has different lengths for {key} and {list(trajectory.keys())[0]}.")
+                    raise RuntimeError(f"In file {trajectory_dir} there is a different lengths for {key} and {list(trajectory.keys())[0]}. ", len(trajectory[key]), len(trajectory[list(trajectory.keys())[0]]))
+                
 
             self.trajectory_lengths.append(len(trajectory[list(trajectory.keys())[0]]))
 
