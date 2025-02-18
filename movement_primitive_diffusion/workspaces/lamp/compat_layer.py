@@ -399,22 +399,17 @@ class AlohaLampEnv(ManagerBasedEnv):
         """
         env_obs: dict[str, torch.Tensor] = {}
 
-        for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:
-            env_obs[part] =self.scene[part].data.root_state_w[:,:7].cpu().squeeze()
-            
-            
-            if part is 'lamp_hood': print(env_obs[part])
-            
-            # torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
-            #                            self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
-        
-
+        for part in ['lamp_bulb', 'lamp_hood', 'lamp_base']:
+            value = torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
+                               self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
+            if part in self.normalize_keys:
+                value =self.get_normalized_value(value, part)
+            env_obs[part] = value
+            print(env_obs[part])
 
         # agent state. Position and velocity of the agent
         env_obs["agent_pos_l"] =   self.get_normalized_value(self.scene['robot_left'].data.joint_pos.cpu().squeeze(), "agent_pos_l") 
         env_obs["agent_pos_r"] =   self.get_normalized_value(self.scene['robot_right'].data.joint_pos.cpu().squeeze(), "agent_pos_r")
-        # env_obs["agent_vel_l"] = self.scene['robot_left'].data.joint_vel.cpu().squeeze()
-        # env_obs["agent_vel_r"] = self.scene['robot_right'].data.joint_vel.cpu().squeeze()
 
 
         # compute normalized velocities
