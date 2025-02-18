@@ -1,0 +1,1 @@
+{"epoch": 749, "loss": 0.04913865102006953, "val_loss": 0.05776510498580638, "start_point_deviation": 0.06727662508825907, "end_point_deviation": 0.1486260470714462, "lr": 0.0, "_timestamp": 1739894473, "_runtime": 52721, "_step": 2250, "success_rate": 0.0, "best_end_point_deviation": 0.14570116444250172, "best_epoch": 701, "_wandb": {"runtime": 52728}}

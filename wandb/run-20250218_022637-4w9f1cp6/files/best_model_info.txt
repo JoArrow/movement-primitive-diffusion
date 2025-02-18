@@ -1,0 +1,1 @@
+epoch=731, performance_metric='end_point_deviation', best_performance_value=0.15268035397626634, mean_train_loss=0.049656202213270786, mean_val_loss=0.05533445785688453

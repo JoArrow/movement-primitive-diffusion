@@ -16,7 +16,7 @@ outputs
 multirun
 
 # wandb logs
-wandb
+# wandb
 
 # data folder
 #data
