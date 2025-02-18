@@ -19,8 +19,9 @@ to_change:
 performance_metric: success_rate # can be anything that is returned in the dict of workspace.test_agent(agent)
 performance_direction: max # {min, max}
 
+
 wandb:
-  project: ???
-  entity: ???
-  group: ???
-  mode: offline # online, offline, disabled
+  entity: johannes-pfeil-karlsruhe-institute-of-technology # wandb-user
+  project: lamp
+  group: movement-primitive-diffusion-experiment
+  mode: online # online, offline, disabled

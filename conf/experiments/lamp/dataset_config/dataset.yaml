@@ -10,7 +10,7 @@ keys:
   - agent_pos_r
   - agent_vel_l
   - agent_vel_r
-  - lamp_base
+  # - lamp_base
   - lamp_bulb
   - lamp_hood
 dt: 0.005555556 # 1/180 What is the time difference between each value in the time series? e.g. 0.1
@@ -20,7 +20,7 @@ normalize_keys:  # <- which of the keys should be normalized? (scaled to an inte
   - action_r
   - agent_pos_l
   - agent_pos_r
-  - lamp_base
+  # - lamp_base
   - lamp_bulb
   - lamp_hood
 normalize_symmetrically: True # False: normalized to [0, 1] instead of [-1, 1]
@@ -39,9 +39,9 @@ scaler_values:
     agent_pos_r:
       min: null
       max: null
-    lamp_base:
-      min: [-0.2, -0.10, -1, -1, -1, -1, -1]
-      max: [0.2, 0.12, 1, 1, 1, 1, 1]
+    # lamp_base:
+    #   min: [-0.2, -0.10, -1, -1, -1, -1, -1]
+    #   max: [0.2, 0.12, 1, 1, 1, 1, 1]
     lamp_bulb:
       min: [-0.2, -0.10, -1, -1, -1, -1, -1]
       max: [0.2, 0.12, 1, 1, 1, 1, 1]
