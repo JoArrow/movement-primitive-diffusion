@@ -15,7 +15,7 @@ device: null  # set in python based on main config
 t_obs: ${t_obs}
 predict_past: ${predict_past}
 
-diffusion_steps: 3
+diffusion_steps: 5
 sigma_min: 0.05
 sigma_max: 10.0
 
