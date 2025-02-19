@@ -401,9 +401,8 @@ class AlohaLampEnv(ManagerBasedEnv):
 
         for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:
             env_obs[part] =self.scene[part].data.root_state_w[:,:7].cpu().squeeze()
-            
-            
-            if part is 'lamp_hood': print(env_obs[part])
+            if part in self.normalize_keys:
+                env_obs[part] = self.get_normalized_value(env_obs[part], part)
             
             # torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
             #                            self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
