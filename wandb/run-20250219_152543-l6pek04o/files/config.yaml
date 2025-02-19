@@ -1,0 +1,836 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.21
+    framework: huggingface
+    huggingface_version: 4.46.2
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    m:
+    - 1: epoch
+      6:
+      - 3
+    - 1: lr
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: loss
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: val_loss
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: start_point_deviation
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: end_point_deviation
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: best_epoch
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: best_end_point_deviation
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: success_rate
+      5: 1
+      6:
+      - 1
+      - 3
+    python_version: 3.10.15
+    start_time: 1739975143
+    t:
+      1:
+      - 1
+      - 11
+      - 41
+      - 49
+      - 50
+      - 55
+      - 71
+      3:
+      - 7
+      - 16
+      4: 3.10.15
+      5: 0.12.21
+      6: 4.46.2
+      8:
+      - 5
+agent_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.agents.diffusion_agent.ProDMPDiffusionAgent
+    device: cuda
+    diffusion_steps: 5
+    ema_config:
+      decay: 0.999
+      inv_gamma: 1.0
+      min_decay: 0.0
+      power: 0.75
+      update_after_step: 0
+      use_ema_warmup: true
+    encoder_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.encoder.Encoder
+      aggregator_config:
+        _target_: movement_primitive_diffusion.aggregators.concatenate.ConcatenateAggregator
+      network_configs:
+      - feature_size:
+        - 7
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: lamp_bulb
+      - feature_size:
+        - 7
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: lamp_hood
+      - feature_size:
+        - 8
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: agent_pos_l
+      - feature_size:
+        - 8
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: agent_pos_r
+      t_obs: 3
+    lr_scheduler_config:
+      _target_: movement_primitive_diffusion.utils.lr_scheduler.get_scheduler
+      last_epoch: -1
+      name: cosine
+      num_training_steps: 149250
+      num_warmup_steps: 500
+    model_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.models.diffusion_model.DiffusionModel
+      inner_model_config:
+        _recursive_: false
+        _target_: movement_primitive_diffusion.models.prodmp_causal_transformer_inner_model.ProDMPCausalTransformerInnerModel
+        action_size: null
+        dropout_probability_attention: 0.1
+        dropout_probability_embedding: 0.1
+        embedding_size: 64
+        n_cond_layers: 0
+        n_heads: 2
+        n_layers: 3
+        prodmp_handler_config:
+          _recursive_: false
+          _target_: movement_primitive_diffusion.utils.mp_utils.ProDMPHandler
+          alpha: 25.0
+          alpha_phase: 2.0
+          auto_scale_basis: false
+          basis_bandwidth_factor: 3.0
+          device: cuda
+          disable_goal: false
+          dt: 0.005555556
+          goal_scale: 1.0
+          learn_delay: false
+          learn_tau: false
+          mp_type: prodmp
+          num_basis: 12
+          num_basis_outside: 0
+          num_dof: null
+          precompute_dt: 0.005555556
+          relative_goal: true
+          tau_factor: 1.0
+          traj_steps: 12
+          traj_type: POSITION
+          weights_scale: 1.0
+        sigma_embedding_config:
+          _recursive_: false
+          _target_: movement_primitive_diffusion.networks.sigma_embeddings.SinusoidalEmbedding
+          embedding_size: 64
+          hidden_size_factor: 4
+        state_size: null
+        t_obs: 3
+        t_pred: 12
+      scaling_config:
+        _recursive_: false
+        _target_: movement_primitive_diffusion.models.scaling.TrajectoryKarrasScaling
+        sigma_data: 0.5
+    noise_scheduler_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.noise_schedulers.ExponentialNoiseScheduler
+      sigma_max: 10.0
+      sigma_min: 0.05
+    optimizer_config:
+      _target_: torch.optim.AdamW
+      betas:
+      - 0.95
+      - 0.999
+      eps: 1.0e-08
+      lr: 0.0001
+      weight_decay: 1.0e-06
+    predict_past: false
+    process_batch_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.datasets.process_batch.ProcessBatchProDMP
+      action_keys:
+      - feature_size:
+        - 7
+        key: action_l
+      - feature_size:
+        - 7
+        key: action_r
+      initial_position_keys:
+      - action_l
+      - action_r
+      initial_values_come_from_action_data: true
+      initial_velocity_keys:
+      - action_vel_l
+      - action_vel_r
+      observation_keys:
+      - lamp_bulb
+      - lamp_hood
+      - agent_pos_l
+      - agent_pos_r
+      relative_action_values: false
+      t_obs: 3
+      t_pred: 12
+    sampler_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.samplers.euler.EulerSampler
+    sigma_distribution_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.distributions.RandLogLogistic
+      loc: 0.5
+      max_value: 10.0
+      min_value: 0.05
+      scale: 0.5
+    sigma_max: 10.0
+    sigma_min: 0.05
+    special_optimizer_config:
+      betas:
+      - 0.95
+      - 0.999
+      encoder_weight_decay: 1.0e-06
+      eps: 1.0e-08
+      learning_rate: 0.0001
+      model_weight_decay: 0.001
+    special_optimizer_function: true
+    t_obs: 3
+    use_ema: true
+data_loader_config:
+  desc: null
+  value:
+    batch_size: 1024
+    num_workers: 0
+    pin_memory: false
+    shuffle: true
+dataset_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.datasets.trajectory_dataset.SubsequenceTrajectoryDataset
+    calculate_velocities_from_to:
+    - - agent_pos_l
+      - agent_vel_l
+    - - agent_pos_r
+      - agent_vel_r
+    - - action_l
+      - action_vel_l
+    - - action_r
+      - action_vel_r
+    crop_sizes: []
+    dt: 0.005555556
+    image_keys: []
+    image_sizes: []
+    keys:
+    - action_l
+    - action_r
+    - agent_pos_l
+    - agent_pos_r
+    - agent_vel_l
+    - agent_vel_r
+    - lamp_bulb
+    - lamp_hood
+    normalize_keys:
+    - action_l
+    - action_r
+    - agent_pos_l
+    - agent_pos_r
+    - lamp_bulb
+    - lamp_hood
+    normalize_symmetrically: true
+    recalculate_velocities_from_to:
+    - - agent_pos_l
+      - agent_vel_l
+    - - agent_pos_r
+      - agent_vel_r
+    - - action_l
+      - action_vel_l
+    - - action_r
+      - action_vel_r
+    scaler_values:
+      action_l:
+        max: null
+        min: null
+      action_r:
+        max: null
+        min: null
+      agent_pos_l:
+        max: null
+        min: null
+      agent_pos_r:
+        max: null
+        min: null
+      lamp_bulb:
+        max:
+        - 0.2
+        - 0.12
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        min:
+        - -0.2
+        - -0.1
+        - -1
+        - -1
+        - -1
+        - -1
+        - -1
+      lamp_hood:
+        max:
+        - 0.2
+        - 0.1
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        min:
+        - -0.2
+        - -0.12
+        - 0.45
+        - -1
+        - -1
+        - -1
+        - -1
+    standardize_keys: []
+    subsequence_length: 14
+    target_dt: null
+    trajectory_dirs:
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_01
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_02
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_03
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_04
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_05
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_06
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_07
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_08
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_09
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_10
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_100
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_11
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_12
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_13
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_14
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_15
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_16
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_17
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_18
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_19
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_20
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_21
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_22
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_23
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_24
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_25
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_26
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_27
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_28
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_29
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_30
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_31
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_32
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_33
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_34
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_35
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_36
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_37
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_38
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_39
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_40
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_41
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_42
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_43
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_44
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_45
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_46
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_47
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_48
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_49
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_50
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_51
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_52
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_53
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_54
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_55
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_56
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_57
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_58
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_59
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_60
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_61
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_62
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_63
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_64
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_65
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_66
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_67
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_68
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_69
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_70
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_71
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_72
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_73
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_74
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_75
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_76
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_77
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_78
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_79
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_80
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_81
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_82
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_83
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_84
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_85
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_86
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_87
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_88
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_89
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_90
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_91
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_92
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_93
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_94
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_95
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_96
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_97
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_98
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_99
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_101
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_102
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_103
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_104
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_105
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_106
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_107
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_108
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_109
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_110
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_111
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_112
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_113
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_114
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_115
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_116
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_117
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_118
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_119
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_120
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_121
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_122
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_123
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_124
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_125
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_126
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_127
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_128
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_129
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_130
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_131
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_132
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_133
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_134
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_135
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_136
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_137
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_138
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_139
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_140
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_141
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_142
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_143
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_144
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_145
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_146
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_147
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_148
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_149
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_150
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_151
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_152
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_153
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_154
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_155
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_156
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_157
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_158
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_159
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_160
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_161
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_162
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_163
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_164
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_165
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_166
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_167
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_168
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_169
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_170
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_171
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_172
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_173
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_174
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_175
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_176
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_177
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_178
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_179
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_180
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_181
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_182
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_183
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_184
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_185
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_186
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_187
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_188
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_189
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_190
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_191
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_192
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_193
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_194
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_195
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_196
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_197
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_198
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_199
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_200
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_201
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_202
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_203
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_204
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_205
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_206
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_207
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_208
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_209
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_210
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_211
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_212
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_213
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_214
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_215
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_216
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_217
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_218
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_219
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_220
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_221
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_222
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_223
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_224
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_225
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_226
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_227
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_228
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_229
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_230
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_231
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_232
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_233
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_234
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_235
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_236
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_237
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_238
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_239
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_240
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_241
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_242
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_243
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_244
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_245
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_246
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_247
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_248
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_249
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_250
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_251
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_252
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_253
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_254
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_255
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_256
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_257
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_258
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_259
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_260
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_261
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_262
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_263
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_264
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_265
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_266
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_267
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_268
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_269
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_270
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_271
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_272
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_273
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_274
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_275
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_276
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_277
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_278
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_279
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_280
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_281
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_282
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_283
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_284
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_285
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_286
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_287
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_288
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_289
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_290
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_291
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_292
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_293
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_294
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_295
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_296
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_297
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_298
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_299
+    - /home/i53/student/mikolajczak/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp_julian/trajectory_300
+dataset_fully_on_gpu:
+  desc: null
+  value: true
+device:
+  desc: null
+  value: cuda
+early_stopping:
+  desc: null
+  value: false
+epochs:
+  desc: null
+  value: 750
+eval_in_env_after_epochs:
+  desc: null
+  value: 9999
+fixed_split:
+  desc: null
+  value: false
+group_from_overrides:
+  desc: null
+  value: false
+ignore_in_name:
+  desc: null
+  value:
+  - group
+  - lamp
+name_from_overrides:
+  desc: null
+  value: true
+num_trajectories_in_env:
+  desc: null
+  value: 10
+performance_direction:
+  desc: null
+  value: min
+performance_metric:
+  desc: null
+  value: end_point_deviation
+predict_past:
+  desc: null
+  value: false
+save_distance:
+  desc: null
+  value: 50
+t_act:
+  desc: null
+  value: 12
+t_obs:
+  desc: null
+  value: 3
+t_pred:
+  desc: null
+  value: 12
+train_split:
+  desc: null
+  value: 0.9
+train_trajectory_dir:
+  desc: null
+  value: null
+trajectory_dir:
+  desc: null
+  value: lamp_julian
+val_trajectory_dir:
+  desc: null
+  value: null
+wandb:
+  desc: null
+  value:
+    entity: johannes-pfeil-karlsruhe-institute-of-technology
+    group: movement-primitive-diffusion-experiment
+    mode: online
+    project: lamp
+workspace_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
+    env_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
+      dt: 0.005555556
+      num_upload_failed_videos: 0
+      num_upload_successful_videos: 0
+      scaler_config:
+        normalize_keys:
+        - action_l
+        - action_r
+        - agent_pos_l
+        - agent_pos_r
+        - lamp_bulb
+        - lamp_hood
+        normalize_symmetrically: true
+        scaler_values:
+          action_l:
+            max:
+            - 0.9618059992790222
+            - 0.4494563937187195
+            - 1.5385828018188477
+            - 1.0569127798080444
+            - 1.5017672777175903
+            - 1.1688933372497559
+            - 12.5
+            min:
+            - -0.5537670850753784
+            - -1.3959225416183472
+            - -0.6504078507423401
+            - -0.7792622447013855
+            - -1.555456519126892
+            - -1.3268934488296509
+            - -12.5
+          action_r:
+            max:
+            - 0.6933593153953552
+            - 0.26998063921928406
+            - 1.3345633745193481
+            - 0.8697671294212341
+            - 1.7870876789093018
+            - 1.6352235078811646
+            - 12.5
+            min:
+            - -0.8528933525085449
+            - -1.6413594484329224
+            - -0.3988350033760071
+            - -1.0323691368103027
+            - -0.9832817316055298
+            - -0.6596117615699768
+            - -12.5
+          agent_pos_l:
+            max:
+            - 0.9649606943130493
+            - 0.4641873836517334
+            - 1.8613883256912231
+            - 1.0551681518554688
+            - 1.5001734495162964
+            - 1.1683578491210938
+            - 0.05700000002980232
+            - 0.05700000002980232
+            min:
+            - -0.552030086517334
+            - -1.3890093564987183
+            - -0.6464924216270447
+            - -0.7727596163749695
+            - -1.5528202056884766
+            - -1.3260042667388916
+            - 0.0
+            - -0.022390000522136688
+          agent_pos_r:
+            max:
+            - 0.6799518465995789
+            - 0.28130438923835754
+            - 1.6202857494354248
+            - 0.7714632153511047
+            - 1.7834726572036743
+            - 1.6371181011199951
+            - 0.05700000002980232
+            - 0.05700000002980232
+            min:
+            - -0.8522523045539856
+            - -1.8500494956970215
+            - -0.38296836614608765
+            - -1.0271064043045044
+            - -0.977686882019043
+            - -0.6600099802017212
+            - 0.0
+            - -0.022390000522136688
+          lamp_bulb:
+            max:
+            - 0.20000000298023224
+            - 0.11999999731779099
+            - 1.0
+            - 1.0
+            - 1.0
+            - 1.0
+            - 1.0
+            min:
+            - -0.20000000298023224
+            - -0.10000000149011612
+            - -1.0
+            - -1.0
+            - -1.0
+            - -1.0
+            - -1.0
+          lamp_hood:
+            max:
+            - 0.20000000298023224
+            - 0.10000000149011612
+            - 1.0
+            - 1.0
+            - 1.0
+            - 1.0
+            - 1.0
+            min:
+            - -0.20000000298023224
+            - -0.11999999731779099
+            - 0.44999998807907104
+            - -1.0
+            - -1.0
+            - -1.0
+            - -1.0
+        standardize_keys: []
+      show_images: false
+      t_obs: 3
+      time_limit: 1300
+    t_act: 12
