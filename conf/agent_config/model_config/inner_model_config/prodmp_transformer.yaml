@@ -10,7 +10,7 @@ action_size: null # set in python based on process_batch
 t_pred: ${t_pred}
 t_obs: ${t_obs}
 
-n_layers: 4
+n_layers: 3
 n_heads: 4
 embedding_size: 128
 n_cond_layers: 0  # -> use an MLP instead of a transformer encoder
