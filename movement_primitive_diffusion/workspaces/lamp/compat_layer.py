@@ -111,6 +111,7 @@ class AlohaLampEnv(ManagerBasedEnv):
                  show_images: bool = False,
                  task = 'lamp',
                  num_envs = 1,
+                 time_limit_hood_grounded = 1000, # maximum time steps the hood is not lifted. if the hood is not lifted after this time, the episode is terminated.
                  ):
         
         env_cfg = AlohaEnvCfg(task='lamp', 
@@ -130,13 +131,15 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.latest_action: np.ndarray = None
         self.latest_action_norm: np.ndarray = None
         self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
-        self.time_step_counter: int = 0
-
         self.task = task
+        self.time_limit_hood_grounded = time_limit_hood_grounded
+        self.hood_grounded_time_left = time_limit_hood_grounded
+
+        self.time_step_counter: int = 0
 
         # SCALING AND NORMALIZATION
         scaler_config = OmegaConf.to_container(scaler_config, resolve=True)
-        print(scaler_config)
+
         self.normalize_keys: list[str] = scaler_config.get("normalize_keys", [])
         self.standardize_keys: list[str] = scaler_config.get("standardize_keys", [])
         self.normalize_symmetrically: bool = scaler_config["normalize_symmetrically"]
@@ -181,6 +184,7 @@ class AlohaLampEnv(ManagerBasedEnv):
         self.latest_action_norm: np.ndarray = None
         self.latest_action_vel: np.ndarray = START_ARM_VEL[:7]
         self.latest_action_vel_norm: np.ndarray  = None
+        self.hood_grounded_time_left = self.time_limit_hood_grounded
         self.time_step_counter: int = 0
 
         # Reset robot controller
@@ -261,7 +265,16 @@ class AlohaLampEnv(ManagerBasedEnv):
         else: # check for each environment if the furniture is assembled.
             part_poses = self.get_part_poses(num_envs=self.num_envs, task=task)
             return self.are_envs_assembled(part_poses, task=task) # returns a list of booleans
-
+    
+    def check_lifted_hood(self, min_height: float = 0.6) -> bool:
+        """
+        Check if the hood is lifted.
+        Returns:
+            bool: A boolean indicating whether the hood is lifted.
+        """
+        is_lifted = self.scene['lamp_hood'].data.root_state_w[0][2].cpu().numpy() > min_height
+        return is_lifted
+    
 
     def get_part_poses(
             self,
@@ -311,11 +324,16 @@ class AlohaLampEnv(ManagerBasedEnv):
 
 
     def step(self, action_norm: np.ndarray):
+        # increment time step counter
         self.time_step_counter += 1
+        # print(f"Time step: {self.time_step_counter}")
+        # print(f"Time left for hood to be lifted: {self.hood_grounded_time_left}")
 
+        # store the previous agent position
         self.previous_agent_l_pos = self.scene['robot_left'].data.joint_pos.cpu().squeeze()
         self.previous_agent_r_pos = self.scene['robot_right'].data.joint_pos.cpu().squeeze()
 
+        # Calculate the normalized acion velocity
         if self.latest_action_norm is not None:
             self.latest_action_vel_norm = (action_norm - self.latest_action_norm) / self.dt
         self.latest_action_norm = action_norm
@@ -334,34 +352,32 @@ class AlohaLampEnv(ManagerBasedEnv):
         action_l = action[:7]
         action_r = action[7:]
 
+        # move the robot arms
         self.controller_left.move_forward_kinematics(action_l)
         self.controller_right.move_forward_kinematics(action_r)
 
+        # step the environment
         _, info = super().step(torch.cat((self.robot_left.data.joint_pos_target, 
                                           self.robot_right.data.joint_pos_target), 1))
-
 
         # get observation and update observation buffer
         env_obs = self.get_observation() # get normalized observation of current frame
         self.update_observation_buffer(env_obs)
 
-
-        # TODO: We do not use rewards, so we just set it to 0.0 
+        # We do not use rewards, so we set it to 0.0 
         reward = 0.0 
-
 
         # Terminate if the furniture is assembled or the time limit is reached
         terminated = self.check_success()
-        
+
+
+        # Truncate if the time limit is reached
         truncated = self.time_limit and self.time_step_counter > self.time_limit
-
-
-
-        # Create emtpy info
-        #info: dict[str, Any] = {}
-
-        # assert(len(env_obs) == len(self.observation_buffer))
-        # assert(env_obs.keys() == self.observation_buffer.keys())
+        # Also truncate if the hood is not lifted after a certain time
+        if self.hood_grounded_time_left and not self.check_lifted_hood():
+            self.hood_grounded_time_left -= 1
+            if self.hood_grounded_time_left <= 0:
+                terminated = True
 
         return env_obs, reward, terminated, truncated, info
 
@@ -383,14 +399,12 @@ class AlohaLampEnv(ManagerBasedEnv):
         for key, val in env_obs.items():
             self.observation_buffer[key].append(val)
         
-        # # Assert that each value of observation_buffer contains the same number of elements
-        # num_elements = len(self.observation_buffer[key])
-        # for key, val in self.observation_buffer.items():
-        #     assert len(val) == num_elements
 
     def get_normalized_value(self, value: np.ndarray | torch.Tensor, key: str) -> np.ndarray:
         assert(key in self.normalize_keys)
-        return normalize(np.array(value), self.scaler_values[key], self.normalize_symmetrically)
+        return normalize(np.array(value), 
+                         self.scaler_values[key], 
+                         self.normalize_symmetrically)
 
     def get_observation(self) -> dict[str, torch.Tensor]:
 
@@ -400,12 +414,13 @@ class AlohaLampEnv(ManagerBasedEnv):
         env_obs: dict[str, torch.Tensor] = {}
 
         for part in ['lamp_base', 'lamp_bulb', 'lamp_hood']:
-            env_obs[part] =self.scene[part].data.root_state_w[:,:7].cpu().squeeze()
+            part_pos_rot = self.scene[part].data.root_state_w[:,:7].cpu().squeeze()
             if part in self.normalize_keys:
-                env_obs[part] = self.get_normalized_value(env_obs[part], part)
-            
-            # torch.cat((self.scene[part].data.root_state_w[:,:3] - self.scene.env_origins[:,:3], 
-            #                            self.scene[part].data.root_state_w[:,3:7]), dim=1).cpu().squeeze()
+                env_obs[part] = self.get_normalized_value(part_pos_rot, part)
+        
+        env_obs["lamp_bulb_pos_xy"] = self.get_normalized_value(self.scene["lamp_bulb"].data.root_state_w[:,:2].cpu().squeeze(), 
+                                                             "lamp_bulb_pos_xy")
+
         
 
 
