@@ -306,7 +306,6 @@ class TrajectoryDataset(Dataset):
         assert(len(handmade_demo_dirs) == min(n_handmades, len(handmade_demo_dirs))), f"Number of selected handmade trajectories does not match the specified number of handmade trajectories."
         assert(len(gen_demo_dirs) == n_generated), f"Number of selected generated trajectories does not match the specified number of generated trajectories."
         assert(len(new_trajectory_dirs) == min(n_handmades, len(handmade_demo_dirs) + n_generated)), f"Number of selected trajectories does not match the sum of the selected handmade and generated trajectories."
-
         return new_trajectory_dirs
 
 

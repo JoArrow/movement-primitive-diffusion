@@ -133,7 +133,7 @@ class CausalTransformer(torch.nn.Module):
             for name in weight_names:
                 weight = getattr(module, name)
                 if weight is not None:
-                    torch.nn.init.normal_(weight, mean=0.0, std=0.02)
+                    torch.nn.init.xavier_uniform_(weight)
 
             bias_names = ["in_proj_bias", "bias_k", "bias_v"]
             for name in bias_names:

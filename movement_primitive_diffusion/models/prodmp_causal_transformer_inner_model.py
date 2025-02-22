@@ -67,7 +67,7 @@ class ProDMPCausalTransformerInnerModel(CausalTransformer):
         Returns:
             torch.Tensor: Model output. Shape (B, t_pred, action_size).
         """
-
+        
         minibatch_size = noised_action.shape[0]
 
         # Process noised action
@@ -94,7 +94,7 @@ class ProDMPCausalTransformerInnerModel(CausalTransformer):
         # (B, t_pred, embedding_size)
         x = self.drop(token_embeddings + self.position_embedding)
         # (B, t_pred, embedding_size)
-        x = self.decoder(tgt=x, memory=memory, tgt_mask=self.mask, memory_mask=self.memory_mask)
+        x = self.decoder(tgt=x, memory=memory) # , tgt_mask=self.mask, memory_mask=self.memory_mask)
 
         # Head
         # The final step in the decoded sequence is passed to a final linear layer to create the ProDMP parameters
