@@ -9,6 +9,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 from omegaconf import OmegaConf
+from typing import Dict, List
 from movement_primitive_diffusion.agents.base_agent import BaseAgent
 
 
@@ -24,7 +25,7 @@ class AlohaLampWorkspace(BaseWorkspace):
         
 
         # Launch the simulation app
-        app_launcher = AppLauncher()# (headless=True)
+        app_launcher = AppLauncher(headless=True)
         simulation_app = app_launcher.app
 
         self.env_config = env_config
@@ -53,14 +54,21 @@ class AlohaLampWorkspace(BaseWorkspace):
     def test_agent(self, agent: BaseAgent, num_trajectories: int = 10) -> dict:
         self.num_successful_trajectories = 0
         self.num_failed_trajectories = 0
+        
+        self.num_successful_lifted_hood = 0
+        self.num_failed_lifted_hood = 0
+
         frames_of_successful_trajectories = []
         frames_of_failed_trajectories = []
 
+        # Loop over the number of trajectories
         for i in (pbar := tqdm(range(num_trajectories), desc="Testing agent", leave=False)):
             self.reset_env(caller_locals=locals())
 
             done = False
             successful = False
+            lifted_hood = False
+            # successful_grabbed_hood = False
             episode_frames = []
             image_shape = self.render_function(caller_locals=locals()).shape
 
@@ -102,6 +110,8 @@ class AlohaLampWorkspace(BaseWorkspace):
                     #    cv2.waitKey(1)
 
                     successful = self.check_success_hook(caller_locals=locals())
+                    if self.check_lifted_hood_hook(caller_locals=locals()): 
+                        lifted_hood = True
 
                     # Check if episode is done
                     done = truncated or terminated
@@ -121,6 +131,13 @@ class AlohaLampWorkspace(BaseWorkspace):
                 if self.num_failed_trajectories < self.num_upload_failed_videos:
                     frames_of_failed_trajectories.extend(episode_frames)
                 self.num_failed_trajectories += 1
+            
+            # Update the number of trajectories where the hood was lifted or not
+            if lifted_hood:
+                self.num_successful_lifted_hood += 1
+            else:
+                self.num_failed_lifted_hood += 1
+
 
             pbar.set_postfix(success_rate=self.num_successful_trajectories / (self.num_successful_trajectories + self.num_failed_trajectories))
 
@@ -137,3 +154,19 @@ class AlohaLampWorkspace(BaseWorkspace):
 
         return self.get_result_dict(caller_locals=locals())
 
+
+    
+    def check_lifted_hood_hook(self, caller_locals: Dict) -> bool:
+        return self.env.check_lifted_hood()
+
+
+    def get_result_dict(self, caller_locals: Dict) -> Dict[str, float]:
+        """Function to modify result dict in subclasses.
+
+        For example adding information to the progress bar.
+        """
+        result_dict = {}
+        result_dict["success_rate"] = self.num_successful_trajectories / (self.num_successful_trajectories + self.num_failed_trajectories)
+        result_dict["success_rate_lifting_hood"] = self.num_successful_lifted_hood / (self.num_successful_lifted_hood + self.num_failed_lifted_hood)
+        result_dict["reward"] = result_dict["success_rate"] + (0.1 * result_dict["success_rate_lifting_hood"])
+        return result_dict
