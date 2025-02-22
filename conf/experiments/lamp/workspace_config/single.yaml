@@ -15,7 +15,7 @@ env_config:
 
   t_obs: ${t_obs}
   dt: 0.005555556
-  time_limit: 1300 #time limit in frames
+  time_limit: 2300 # 1300 time limit in frames
 
 
   num_upload_successful_videos: 0
