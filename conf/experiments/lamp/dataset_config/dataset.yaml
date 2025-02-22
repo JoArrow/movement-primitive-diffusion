@@ -10,8 +10,7 @@ keys:
   - agent_pos_r
   - agent_vel_l
   - agent_vel_r
-  # - lamp_base
-  - lamp_bulb
+  - lamp_bulb_pos_xy
   - lamp_hood
 dt: 0.005555556 # 1/180 What is the time difference between each value in the time series? e.g. 0.1
 target_dt: null # <- Optional resampling of your time series
@@ -20,8 +19,7 @@ normalize_keys:  # <- which of the keys should be normalized? (scaled to an inte
   - action_r
   - agent_pos_l
   - agent_pos_r
-  # - lamp_base
-  - lamp_bulb
+  - lamp_bulb_pos_xy
   - lamp_hood
 normalize_symmetrically: True # False: normalized to [0, 1] instead of [-1, 1]
 standardize_keys: [] # <- which of the keys should be standardized? (zero mean, std of 1)
@@ -39,15 +37,12 @@ scaler_values:
     agent_pos_r:
       min: null
       max: null
-    # lamp_base:
-    #   min: [-0.2, -0.10, -1, -1, -1, -1, -1]
-    #   max: [0.2, 0.12, 1, 1, 1, 1, 1]
-    lamp_bulb:
-      min: [-0.2, -0.10, -1, -1, -1, -1, -1]
-      max: [0.2, 0.12, 1, 1, 1, 1, 1]
+    lamp_bulb_pos_xy:
+      min: null
+      max: null
     lamp_hood:
-      min: [-0.2, -0.12, 0.45, -1, -1, -1, -1]
-      max: [0.2, 0.10, 1, 1, 1, 1, 1]
+      min: null #[-0.2, -0.12, 0.40, -1, -1, -1, -1]
+      max: null #[0.2, 0.10, 1, 1, 1, 1, 1]
 
 
 calculate_velocities_from_to:  # dataset does not have action_velocities -> calculate
