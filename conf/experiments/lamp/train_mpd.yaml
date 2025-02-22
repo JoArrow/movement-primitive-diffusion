@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - workspace_config: dummy  # single, dummy or  vector
+  - workspace_config: single  # single, dummy or  vector
   - dataset_config: dataset
   - /agent_config: prodmp_transformer_agent  # <- this is defined in ./conf/agent_config/prodmp_transformer_agent.yaml
   - process_batch_config: prodmp
@@ -9,18 +9,18 @@ defaults:
   - _self_
 
 # Set what should be used to determine if model performance increased in testing in environment
-performance_metric: end_point_deviation # can be anything that is returned in the dict of workspace.test_agent(agent) or in epoch_info
-performance_direction: min # {min, max}
+performance_metric: reward #end_point_deviation # can be anything that is returned in the dict of workspace.test_agent(agent) or in epoch_info
+performance_direction: max #min # {min, max}
 
 device: auto  # {auto, cpu, cuda}. auto will select cuda if available, cpu otherwise
-t_obs: 3
-t_pred: 12
-t_act: 12
+t_obs: 15 #3
+t_pred: 60 # 12
+t_act: 60 # 12
 predict_past: False
 
 train_split: 0.9 # <- use 90% of the data for training and 10% for validation
 dataset_fully_on_gpu: True # <- load the whole dataset onto the GPU to speed up training. If that is too much -> set to False (will load into RAM, and only load minibatches to GPU).
-trajectory_dir: lamp_julian
+trajectory_dir: lamp
 
 fixed_split: False # <- can be used to specify a fixed subset of demonstrations to use for training and validation
 train_trajectory_dir: null
@@ -33,12 +33,12 @@ data_loader_config:
   batch_size: 1024
 
 
-epochs: 750 # 3000
+epochs: 1000 #750
 
 early_stopping: False
-eval_in_env_after_epochs: 9999 # 9999
-num_trajectories_in_env: 10 # 100
-save_distance: 50 # additionally to the best model, save model every n epochs
+eval_in_env_after_epochs: 25 # 9999
+num_trajectories_in_env: 20 # 100
+save_distance: 100 # additionally to the best model, save model every n epochs
 
 
 group_from_overrides: False
