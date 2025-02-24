@@ -1,0 +1,1076 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.21
+    framework: huggingface
+    huggingface_version: 4.46.3
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    m:
+    - 1: epoch
+      6:
+      - 3
+    - 1: lr
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: loss
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: val_loss
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: start_point_deviation
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: end_point_deviation
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: best_epoch
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: best_reward
+      5: 1
+      6:
+      - 1
+      - 3
+    - 1: success_rate
+      5: 1
+      6:
+      - 1
+      - 3
+    python_version: 3.10.15
+    start_time: 1740304831
+    t:
+      1:
+      - 1
+      - 11
+      - 41
+      - 49
+      - 50
+      - 55
+      - 71
+      3:
+      - 7
+      - 16
+      4: 3.10.15
+      5: 0.12.21
+      6: 4.46.3
+      8:
+      - 5
+agent_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.agents.diffusion_agent.ProDMPDiffusionAgent
+    device: cuda
+    diffusion_steps: 5
+    ema_config:
+      decay: 0.999
+      inv_gamma: 1.0
+      min_decay: 0.0
+      power: 0.75
+      update_after_step: 0
+      use_ema_warmup: true
+    encoder_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.encoder.Encoder
+      aggregator_config:
+        _target_: movement_primitive_diffusion.aggregators.concatenate.ConcatenateAggregator
+      network_configs:
+      - feature_size:
+        - 2
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: lamp_bulb_pos_xy
+      - feature_size:
+        - 7
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: lamp_hood
+      - feature_size:
+        - 8
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: agent_pos_l
+      - feature_size:
+        - 8
+        network_config:
+          _target_: movement_primitive_diffusion.networks.layers.PassThrough
+        observation_key: agent_pos_r
+      t_obs: 15
+    lr_scheduler_config:
+      _target_: movement_primitive_diffusion.utils.lr_scheduler.get_scheduler
+      last_epoch: -1
+      name: cosine
+      num_training_steps: 354000
+      num_warmup_steps: 500
+    model_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.models.diffusion_model.DiffusionModel
+      inner_model_config:
+        _recursive_: false
+        _target_: movement_primitive_diffusion.models.prodmp_causal_transformer_inner_model.ProDMPCausalTransformerInnerModel
+        action_size: null
+        dropout_probability_attention: 0.1
+        dropout_probability_embedding: 0.1
+        embedding_size: 128
+        n_cond_layers: 0
+        n_heads: 4
+        n_layers: 2
+        prodmp_handler_config:
+          _recursive_: false
+          _target_: movement_primitive_diffusion.utils.mp_utils.ProDMPHandler
+          alpha: 25.0
+          alpha_phase: 2.0
+          auto_scale_basis: false
+          basis_bandwidth_factor: 3.0
+          device: cuda
+          disable_goal: false
+          dt: 0.005555556
+          goal_scale: 1.0
+          learn_delay: false
+          learn_tau: false
+          mp_type: prodmp
+          num_basis: 60
+          num_basis_outside: 0
+          num_dof: null
+          precompute_dt: 0.005555556
+          relative_goal: true
+          tau_factor: 1.0
+          traj_steps: 60
+          traj_type: POSITION
+          weights_scale: 1.0
+        sigma_embedding_config:
+          _recursive_: false
+          _target_: movement_primitive_diffusion.networks.sigma_embeddings.SinusoidalEmbedding
+          embedding_size: 128
+          hidden_size_factor: 4
+        state_size: null
+        t_obs: 15
+        t_pred: 60
+      scaling_config:
+        _recursive_: false
+        _target_: movement_primitive_diffusion.models.scaling.TrajectoryKarrasScaling
+        sigma_data: 0.5
+    noise_scheduler_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.noise_schedulers.ExponentialNoiseScheduler
+      sigma_max: 10.0
+      sigma_min: 0.05
+    optimizer_config:
+      _target_: torch.optim.AdamW
+      betas:
+      - 0.95
+      - 0.999
+      eps: 1.0e-08
+      lr: 0.0001
+      weight_decay: 1.0e-06
+    predict_past: false
+    process_batch_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.datasets.process_batch.ProcessBatchProDMP
+      action_keys:
+      - feature_size:
+        - 7
+        key: action_l
+      - feature_size:
+        - 7
+        key: action_r
+      initial_position_keys:
+      - action_l
+      - action_r
+      initial_values_come_from_action_data: true
+      initial_velocity_keys:
+      - action_vel_l
+      - action_vel_r
+      observation_keys:
+      - lamp_bulb_pos_xy
+      - lamp_hood
+      - agent_pos_l
+      - agent_pos_r
+      relative_action_values: false
+      t_obs: 15
+      t_pred: 60
+    sampler_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.samplers.euler.EulerSampler
+    sigma_distribution_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.distributions.RandLogLogistic
+      loc: 0.5
+      max_value: 10.0
+      min_value: 0.05
+      scale: 0.5
+    sigma_max: 10.0
+    sigma_min: 0.05
+    special_optimizer_config:
+      betas:
+      - 0.95
+      - 0.999
+      encoder_weight_decay: 1.0e-06
+      eps: 1.0e-08
+      learning_rate: 0.0001
+      model_weight_decay: 0.001
+    special_optimizer_function: true
+    t_obs: 15
+    use_ema: true
+data_loader_config:
+  desc: null
+  value:
+    batch_size: 1024
+    num_workers: 0
+    pin_memory: false
+    shuffle: true
+dataset_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.datasets.trajectory_dataset.SubsequenceTrajectoryDataset
+    calculate_velocities_from_to:
+    - - agent_pos_l
+      - agent_vel_l
+    - - agent_pos_r
+      - agent_vel_r
+    - - action_l
+      - action_vel_l
+    - - action_r
+      - action_vel_r
+    crop_sizes: []
+    dt: 0.005555556
+    image_keys: []
+    image_sizes: []
+    keys:
+    - action_l
+    - action_r
+    - agent_pos_l
+    - agent_pos_r
+    - agent_vel_l
+    - agent_vel_r
+    - lamp_bulb_pos_xy
+    - lamp_hood
+    normalize_keys:
+    - action_l
+    - action_r
+    - agent_pos_l
+    - agent_pos_r
+    - lamp_bulb_pos_xy
+    - lamp_hood
+    normalize_symmetrically: true
+    recalculate_velocities_from_to:
+    - - agent_pos_l
+      - agent_vel_l
+    - - agent_pos_r
+      - agent_vel_r
+    - - action_l
+      - action_vel_l
+    - - action_r
+      - action_vel_r
+    scaler_values:
+      action_l:
+        max: null
+        min: null
+      action_r:
+        max: null
+        min: null
+      agent_pos_l:
+        max: null
+        min: null
+      agent_pos_r:
+        max: null
+        min: null
+      lamp_bulb_pos_xy:
+        max: null
+        min: null
+      lamp_hood:
+        max: null
+        min: null
+    standardize_keys: []
+    subsequence_length: 74
+    target_dt: null
+    trajectory_dirs:
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_18
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_04
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_05
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_08
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_09
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_10
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_01
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_02
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_03
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_06
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_07
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_100
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_11
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_12
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_13
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_14
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_15
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_16
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_17
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_19
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_20
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_21
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_22
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_23
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_25
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_27
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_29
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_30
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_31
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_32
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_33
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_34
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_35
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_37
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_39
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_40
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_41
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_42
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_44
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_45
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_46
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_47
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_48
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_49
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_50
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_51
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_52
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_53
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_54
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_55
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_56
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_57
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_58
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_59
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_60
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_61
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_62
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_63
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_64
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_65
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_66
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_67
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_68
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_69
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_70
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_71
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_72
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_73
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_74
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_75
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_76
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_77
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_78
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_79
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_80
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_81
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_82
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_83
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_84
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_85
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_86
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_87
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_88
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_89
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_90
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_91
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_92
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_93
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_94
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_95
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_96
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_97
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_98
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_99
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_101
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_102
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_103
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_104
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_105
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_106
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_107
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_108
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_109
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_110
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_111
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_112
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_113
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_114
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_115
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_116
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_117
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_118
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_119
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_120
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_121
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_122
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_123
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_124
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_125
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_126
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_127
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_128
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_129
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_130
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_131
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_132
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_133
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_134
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_135
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_136
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_137
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_138
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_139
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_140
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_141
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_142
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_143
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_144
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_145
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_146
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_147
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_148
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_149
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_150
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_151
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_152
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_153
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_154
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_156
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_157
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_158
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_159
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_160
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_161
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_162
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_163
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_164
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_165
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_166
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_167
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_168
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_169
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_170
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_171
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_172
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_173
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_174
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_175
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_176
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_177
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_178
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_179
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_180
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_181
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_182
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_183
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_184
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_185
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_186
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_187
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_188
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_189
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_190
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_191
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_192
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_193
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_194
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_195
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_196
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_197
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_198
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_199
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_200
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_201
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_202
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_203
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_204
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_205
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_206
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_207
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_208
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_209
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_210
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_211
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_212
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_213
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_214
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_215
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_216
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_217
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_218
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_219
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_220
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_221
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_222
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_223
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_224
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_225
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_226
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_227
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_228
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_229
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_230
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_231
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_232
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_233
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_234
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_235
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_236
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_237
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_238
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_239
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_240
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_241
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_242
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_243
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_244
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_245
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_246
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_247
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_248
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_249
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_250
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_251
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_252
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_253
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_254
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_255
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_256
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_257
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_258
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_259
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_260
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_261
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_262
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_263
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_264
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_265
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_266
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_267
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_268
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_269
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_270
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_271
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_272
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_273
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_274
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_275
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_276
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_277
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_278
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_279
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_280
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_281
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_282
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_283
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_284
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_285
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_286
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_287
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_288
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_289
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_290
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_291
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_292
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_293
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_294
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_295
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_296
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_297
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_298
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_299
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_300
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_01_randomized_62_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_02_randomized_41_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_03_randomized_67_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_04_randomized_98_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_05_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_06_randomized_46_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_07_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_08_randomized_58_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_09_randomized_75_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_10_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_100_randomized_49_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_101_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_102_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_103_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_104_randomized_79_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_105_randomized_31_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_106_randomized_24_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_107_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_108_randomized_23_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_109_randomized_77_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_11_randomized_58_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_110_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_111_randomized_38_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_113_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_115_randomized_5_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_116_randomized_23_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_117_randomized_6_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_118_randomized_27_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_119_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_12_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_120_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_121_randomized_17_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_122_randomized_40_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_123_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_124_randomized_60_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_125_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_126_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_127_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_128_randomized_17_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_129_randomized_27_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_13_randomized_48_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_130_randomized_18_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_131_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_132_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_133_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_134_randomized_27_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_135_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_136_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_137_randomized_65_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_138_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_139_randomized_3_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_14_randomized_67_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_140_randomized_81_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_141_randomized_16_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_142_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_143_randomized_55_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_144_randomized_35_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_145_randomized_70_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_146_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_147_randomized_7_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_148_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_149_randomized_59_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_15_randomized_74_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_150_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_151_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_152_randomized_55_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_153_randomized_63_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_154_randomized_26_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_156_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_157_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_158_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_159_randomized_7_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_16_randomized_46_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_160_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_162_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_163_randomized_46_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_164_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_165_randomized_31_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_166_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_167_randomized_3_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_168_randomized_54_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_169_randomized_22_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_17_randomized_52_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_170_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_171_randomized_36_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_172_randomized_40_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_173_randomized_45_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_174_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_175_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_176_randomized_36_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_177_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_178_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_179_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_18_randomized_53_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_180_randomized_24_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_181_randomized_62_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_182_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_183_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_184_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_185_randomized_72_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_186_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_187_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_188_randomized_40_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_189_randomized_13_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_19_randomized_70_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_190_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_191_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_192_randomized_37_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_193_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_194_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_195_randomized_55_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_196_randomized_51_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_197_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_198_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_199_randomized_27_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_20_randomized_16_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_200_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_201_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_202_randomized_41_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_203_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_204_randomized_41_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_205_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_206_randomized_16_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_207_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_209_randomized_73_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_21_randomized_63_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_210_randomized_38_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_211_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_213_randomized_73_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_214_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_215_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_216_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_217_randomized_31_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_218_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_219_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_22_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_220_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_221_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_222_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_223_randomized_53_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_224_randomized_38_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_225_randomized_82_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_226_randomized_24_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_227_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_228_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_229_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_23_randomized_18_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_230_randomized_60_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_231_randomized_38_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_232_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_233_randomized_6_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_234_randomized_48_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_235_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_236_randomized_36_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_237_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_238_randomized_22_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_239_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_240_randomized_47_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_241_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_242_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_243_randomized_75_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_244_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_245_randomized_5_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_246_randomized_6_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_247_randomized_24_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_248_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_249_randomized_62_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_25_randomized_68_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_250_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_251_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_252_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_253_randomized_47_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_254_randomized_3_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_255_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_256_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_257_randomized_16_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_258_randomized_28_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_259_randomized_18_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_260_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_261_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_262_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_263_randomized_13_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_264_randomized_22_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_265_randomized_21_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_266_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_267_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_268_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_269_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_27_randomized_22_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_270_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_271_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_272_randomized_27_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_273_randomized_52_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_274_randomized_49_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_275_randomized_18_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_276_randomized_22_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_277_randomized_18_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_278_randomized_62_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_279_randomized_36_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_280_randomized_34_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_281_randomized_40_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_282_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_283_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_284_randomized_67_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_285_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_286_randomized_6_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_287_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_288_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_289_randomized_35_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_29_randomized_64_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_291_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_292_randomized_19_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_293_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_294_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_295_randomized_31_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_296_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_297_randomized_33_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_298_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_299_randomized_3_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_30_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_300_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_31_randomized_49_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_32_randomized_71_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_33_randomized_66_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_34_randomized_39_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_35_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_37_randomized_5_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_39_randomized_89_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_40_randomized_68_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_41_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_42_randomized_23_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_44_randomized_71_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_45_randomized_62_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_46_randomized_7_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_47_randomized_40_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_48_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_49_randomized_23_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_50_randomized_44_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_51_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_52_randomized_9_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_53_randomized_5_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_54_randomized_4_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_55_randomized_10_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_56_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_57_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_58_randomized_2_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_59_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_60_randomized_49_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_61_randomized_26_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_62_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_63_randomized_74_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_64_randomized_23_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_65_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_66_randomized_50_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_67_randomized_30_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_68_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_69_randomized_15_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_70_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_71_randomized_12_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_72_randomized_47_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_73_randomized_71_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_74_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_75_randomized_73_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_76_randomized_17_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_77_randomized_32_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_78_randomized_1_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_79_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_80_randomized_25_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_81_randomized_7_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_82_randomized_13_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_83_randomized_11_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_85_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_86_randomized_29_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_87_randomized_43_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_88_randomized_51_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_89_randomized_16_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_91_randomized_56_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_92_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_93_randomized_14_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_94_randomized_31_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_95_randomized_7_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_96_randomized_42_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_97_randomized_20_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_98_randomized_21_1
+    - /home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/data/lamp/trajectory_99_randomized_41_1
+dataset_fully_on_gpu:
+  desc: null
+  value: true
+device:
+  desc: null
+  value: cuda
+early_stopping:
+  desc: null
+  value: false
+epochs:
+  desc: null
+  value: 2000
+eval_in_env_after_epochs:
+  desc: null
+  value: 25
+fixed_split:
+  desc: null
+  value: false
+group_from_overrides:
+  desc: null
+  value: false
+ignore_in_name:
+  desc: null
+  value:
+  - group
+  - lamp
+name_from_overrides:
+  desc: null
+  value: true
+num_trajectories_in_env:
+  desc: null
+  value: 20
+performance_direction:
+  desc: null
+  value: max
+performance_metric:
+  desc: null
+  value: reward
+predict_past:
+  desc: null
+  value: false
+save_distance:
+  desc: null
+  value: 100
+t_act:
+  desc: null
+  value: 60
+t_obs:
+  desc: null
+  value: 15
+t_pred:
+  desc: null
+  value: 60
+train_split:
+  desc: null
+  value: 0.9
+train_trajectory_dir:
+  desc: null
+  value: null
+trajectory_dir:
+  desc: null
+  value: lamp
+val_trajectory_dir:
+  desc: null
+  value: null
+wandb:
+  desc: null
+  value:
+    entity: johannes-pfeil-karlsruhe-institute-of-technology
+    group: movement-primitive-diffusion-experiment
+    mode: online
+    project: lamp
+workspace_config:
+  desc: null
+  value:
+    _recursive_: false
+    _target_: movement_primitive_diffusion.workspaces.lamp.lamp_workspace.AlohaLampWorkspace
+    env_config:
+      _recursive_: false
+      _target_: movement_primitive_diffusion.workspaces.lamp.compat_layer.AlohaLampEnv
+      dt: 0.005555556
+      num_upload_failed_videos: 0
+      num_upload_successful_videos: 0
+      scaler_config:
+        normalize_keys:
+        - action_l
+        - action_r
+        - agent_pos_l
+        - agent_pos_r
+        - lamp_bulb_pos_xy
+        - lamp_hood
+        normalize_symmetrically: true
+        scaler_values:
+          action_l:
+            max:
+            - 0.9618059992790222
+            - 0.4494563937187195
+            - 1.5385828018188477
+            - 1.0569127798080444
+            - 1.5017672777175903
+            - 1.1688933372497559
+            - 12.5
+            min:
+            - -0.5537670850753784
+            - -1.3959225416183472
+            - -0.16873788833618164
+            - -0.7792622447013855
+            - -1.555456519126892
+            - -1.3268934488296509
+            - -12.5
+          action_r:
+            max:
+            - 0.6933593153953552
+            - 0.26998063921928406
+            - 1.3345633745193481
+            - 0.8697671294212341
+            - 1.7870876789093018
+            - 1.6352235078811646
+            - 12.5
+            min:
+            - -0.8528933525085449
+            - -1.6413594484329224
+            - -0.3988350033760071
+            - -1.0323691368103027
+            - -0.748582661151886
+            - -0.6596117615699768
+            - -12.5
+          agent_pos_l:
+            max:
+            - 0.9649606943130493
+            - 0.4641873836517334
+            - 1.8613883256912231
+            - 1.0551681518554688
+            - 1.5001734495162964
+            - 1.1683578491210938
+            - 0.05700000002980232
+            - 0.05700000002980232
+            min:
+            - -0.552030086517334
+            - -1.3890093564987183
+            - -0.1644253432750702
+            - -0.7727596163749695
+            - -1.5528202056884766
+            - -1.3260042667388916
+            - 0.020999999716877937
+            - -0.022390000522136688
+          agent_pos_r:
+            max:
+            - 0.6799518465995789
+            - 0.28130438923835754
+            - 1.6202857494354248
+            - 0.7714632153511047
+            - 1.7834726572036743
+            - 1.6371181011199951
+            - 0.05700000002980232
+            - 0.05700000002980232
+            min:
+            - -0.8522523045539856
+            - -1.8500494956970215
+            - -0.38296836614608765
+            - -1.0271064043045044
+            - -0.7448307275772095
+            - -0.6600099802017212
+            - 0.020999999716877937
+            - -0.022390000522136688
+          lamp_bulb_pos_xy:
+            max:
+            - 0.19827118515968323
+            - 0.24335616827011108
+            min:
+            - -0.1999024599790573
+            - 0.026923928409814835
+          lamp_hood:
+            max:
+            - 0.23760920763015747
+            - 0.2740963399410248
+            - 0.8283730745315552
+            - 0.8150198459625244
+            - 0.7904052138328552
+            - 0.3524198830127716
+            - 0.8525161743164062
+            min:
+            - -0.3271521329879761
+            - -0.2649228274822235
+            - 0.43256816267967224
+            - -0.9308199882507324
+            - -0.7766530513763428
+            - -0.9999891519546509
+            - -0.9025612473487854
+        standardize_keys: []
+      show_images: false
+      t_obs: 15
+      time_limit: 2300
+    t_act: 60

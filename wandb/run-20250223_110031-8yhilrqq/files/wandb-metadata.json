@@ -1,0 +1,28 @@
+{
+    "os": "Linux-5.4.0-204-generic-x86_64-with-glibc2.31",
+    "python": "3.10.15",
+    "heartbeatAt": "2025-02-23T10:00:32.939854",
+    "startedAt": "2025-02-23T10:00:31.251638",
+    "docker": null,
+    "gpu": "NVIDIA GeForce RTX 2060 SUPER",
+    "gpu_count": 1,
+    "cpu_count": 16,
+    "cuda": null,
+    "args": [
+        "--config-name",
+        "dummy",
+        "+experiments/lamp=train_mpd"
+    ],
+    "state": "running",
+    "program": "/home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion/scripts/train.py",
+    "codePath": "scripts/train.py",
+    "git": {
+        "remote": "git@github.com:JoArrow/movement-primitive-diffusion.git",
+        "commit": "aba3d40056c9e37a2cf9acedac761e66466ec8d0"
+    },
+    "email": "Johannes.Pfeil@gmx.de",
+    "root": "/home/i53/student/pfeil/aloha_platform_simulation/ai/movement-primitive-diffusion",
+    "host": "bernhard",
+    "username": "pfeil",
+    "executable": "/home/i53/student/pfeil/miniconda3/envs/isaaclab/bin/python"
+}

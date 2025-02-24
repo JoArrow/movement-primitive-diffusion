@@ -1,0 +1,1 @@
+epoch=0675, performance_metric='reward', best_performance_value=0.08000000000000002, mean_train_loss=0.005903301229121658, mean_val_loss=0.01735747880524113
