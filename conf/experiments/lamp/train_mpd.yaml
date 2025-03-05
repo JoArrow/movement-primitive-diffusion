@@ -13,9 +13,9 @@ performance_metric: reward #end_point_deviation # can be anything that is return
 performance_direction: max #min # {min, max}
 
 device: auto  # {auto, cpu, cuda}. auto will select cuda if available, cpu otherwise
-t_obs: 15 #3
+t_obs: 6 #3
 t_pred: 60 # 12
-t_act: 60 # 12
+t_act: 30 # 12
 predict_past: False
 
 train_split: 0.9 # <- use 90% of the data for training and 10% for validation
@@ -30,15 +30,15 @@ data_loader_config:
   shuffle: True
   pin_memory: False
   num_workers: 0 # TODO: cannot change num_workers
-  batch_size: 1024
+  batch_size: 128
 
 
-epochs: 1000 #750
+epochs: 600 #750
 
 early_stopping: False
 eval_in_env_after_epochs: 25 # 9999
-num_trajectories_in_env: 20 # 100
-save_distance: 100 # additionally to the best model, save model every n epochs
+num_trajectories_in_env: 50 # 100
+save_distance: 25 # additionally to the best model, save model every n epochs
 
 
 group_from_overrides: False
