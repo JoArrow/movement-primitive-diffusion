@@ -95,7 +95,7 @@ class TrajectoryDataset(Dataset):
         recalculate_velocities_from_to: List[Tuple[str, str]] = [],
         pad_start: int = 0,
         pad_end: int = 0,
-        n_handmades_generated: Tuple[int, int] = (None, 0),
+        n_handmades_generated: List[int] = [None,0]
         #n_handmades: int = None,
         #n_generated: int = 0,
     ):
@@ -653,7 +653,7 @@ class SubsequenceTrajectoryDataset(TrajectoryDataset):
         ignore_shorter_trajectories: bool = False,
         pad_start: int = 0,
         pad_end: int = 0,
-        n_handmades_generated: Tuple[int, int] = (None, 0),
+        n_handmades_generated: List[int]= [None, 0],
         # n_handmades: int = None,
         # n_generated: int = 0,
     ):
