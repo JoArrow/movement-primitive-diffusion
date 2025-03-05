@@ -20,7 +20,7 @@ hydra:
     additional_parameters:
       cpus-per-task: 8  # maybe more?
   sweeper:
-    defaults:
+    params:
       dataset_config: dataset_0 , dataset_1
 
 # Set what should be used to determine if model performance increased in testing in environment
