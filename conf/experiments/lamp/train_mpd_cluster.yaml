@@ -19,9 +19,9 @@ hydra:
     mem_per_gpu: 65536  # in MB
     additional_parameters:
       cpus-per-task: 8  # maybe more?
-  sweeper:
-    params:
-      dataset_config: dataset_0 , dataset_1
+  # sweeper:
+  #   params:
+  #     dataset_config: dataset_0 , dataset_1
 
 # Set what should be used to determine if model performance increased in testing in environment
 performance_metric: reward #end_point_deviation # can be anything that is returned in the dict of workspace.test_agent(agent) or in epoch_info
