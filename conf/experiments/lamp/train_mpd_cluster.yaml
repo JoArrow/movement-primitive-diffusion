@@ -1,5 +1,6 @@
 # @package _global_
 defaults:
+  - platform: bwuni_all_gpus
   - workspace_config: dummy  # single, dummy or  vector
   - dataset_config: dataset #, dataset_1, dataset_2, dataset_3, dataset_4, dataset_5, dataset_300_1, dataset_300_2, dataset_300_3, dataset_300_4, dataset_300_5 
   - /agent_config: prodmp_transformer_agent  # <- this is defined in ./conf/agent_config/prodmp_transformer_agent.yaml
@@ -7,8 +8,6 @@ defaults:
   - encoder_config: passthrough
   - override /agent_config/model_config/inner_model_config: prodmp_transformer # <- this is defined in ./conf/agent_config/model_config/inner_model_config/prodmp_transformer.yaml
   - _self_
-
-  - platform: bwuni_all_gpus
   - override /hydra/launcher: submitit_slurm
 
 hydra:
