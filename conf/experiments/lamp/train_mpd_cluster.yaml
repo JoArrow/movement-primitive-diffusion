@@ -13,8 +13,8 @@ hydra:
   mode: MULTIRUN  # needed for launcher to be used
   launcher:
     # launcher/cluster specific options
-    partition: "dev_gpu_4"
-    timeout_min: 20 # in minutes, maximum time on this queue
+    partition: "bwuni_all_gpus"
+    timeout_min: 1800  # in minutes, maximum time on this queue
     gres: gpu:1  # one gpu allocated
     mem_per_gpu: 65536  # in MB
     additional_parameters:
@@ -48,7 +48,7 @@ data_loader_config:
   shuffle: True
   pin_memory: False
   num_workers: 0 # TODO: cannot change num_workers
-  batch_size: 1024
+  batch_size: 2048
 
 
 epochs: 600 #750
