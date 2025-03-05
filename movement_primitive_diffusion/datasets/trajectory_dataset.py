@@ -95,10 +95,12 @@ class TrajectoryDataset(Dataset):
         recalculate_velocities_from_to: List[Tuple[str, str]] = [],
         pad_start: int = 0,
         pad_end: int = 0,
-        n_handmades: int = None,
-        n_generated: int = 0,
+        n_handmades_generated: Tuple[int, int] = (None, 0),
+        #n_handmades: int = None,
+        #n_generated: int = 0,
     ):
-        #self.trajectory_dirs = trajectory_dirs
+        
+        n_handmades, n_generated = n_handmades_generated
         n_handmades = len(trajectory_dirs) if n_handmades is None else n_handmades
         self.trajectory_dirs = self.get_trajectories(trajectory_dirs=trajectory_dirs,
                                                      n_handmades=n_handmades,
@@ -651,8 +653,9 @@ class SubsequenceTrajectoryDataset(TrajectoryDataset):
         ignore_shorter_trajectories: bool = False,
         pad_start: int = 0,
         pad_end: int = 0,
-        n_handmades: int = None,
-        n_generated: int = 0,
+        n_handmades_generated: Tuple[int, int] = (None, 0),
+        # n_handmades: int = None,
+        # n_generated: int = 0,
     ):
         super().__init__(
             trajectory_dirs=trajectory_dirs,
@@ -672,8 +675,9 @@ class SubsequenceTrajectoryDataset(TrajectoryDataset):
             recalculate_velocities_from_to=recalculate_velocities_from_to,
             pad_start=pad_start,
             pad_end=pad_end,
-            n_handmades= n_handmades,
-            n_generated =n_generated,
+            n_handmades_generated= n_handmades_generated,
+            # n_handmades= n_handmades,
+            # n_generated =n_generated,
         )
 
         self.subsequence_length = subsequence_length
