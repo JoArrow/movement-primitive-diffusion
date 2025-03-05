@@ -21,7 +21,7 @@ hydra:
       cpus-per-task: 4  # maybe more?
   sweeper:
     params:
-      n_handmades_generated: [[290,0],[240,50],[190,100]] #,[140,150],[90,200],[40,250]
+      dataset_config/dataset/n_handmades_generated: [[290,0],[240,50],[190,100]] #,[140,150],[90,200],[40,250]
 
       #dataset_config: dataset_0, dataset_1, dataset_2, dataset_3, dataset_4, dataset_5, dataset_300_1, dataset_300_2, dataset_300_3, dataset_300_4, dataset_300_5 
 
