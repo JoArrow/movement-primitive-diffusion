@@ -21,7 +21,7 @@ hydra:
       cpus-per-task: 4  # maybe more?
   sweeper:
     params:
-      t_obs: 6,2,10
+      - t_obs: 6,2,10
 
 # Set what should be used to determine if model performance increased in testing in environment
 performance_metric: reward #end_point_deviation # can be anything that is returned in the dict of workspace.test_agent(agent) or in epoch_info
