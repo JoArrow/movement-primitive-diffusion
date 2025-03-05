@@ -18,7 +18,7 @@ hydra:
     gres: gpu:11  # one gpu allocated
     mem_per_gpu: 65536  # in MB
     additional_parameters:
-      cpus-per-task: 8  # maybe more?
+      cpus-per-task: 4  # maybe more?
   # sweeper:
   #   params:
   #     dataset_config: dataset_0 , dataset_1
