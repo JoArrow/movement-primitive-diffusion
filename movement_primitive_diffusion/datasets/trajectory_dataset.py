@@ -1,3 +1,4 @@
+import os
 import random
 import numpy as np
 import pickle
@@ -279,10 +280,12 @@ class TrajectoryDataset(Dataset):
     def get_trajectories(self, 
                          trajectory_dirs: list,
                          n_handmades: int, 
-                         n_generated: int) -> List[str]:
+                         n_generated: int, it = 0) -> List[str]:
         """ Get list of trajector a specified number of handemade and generated trajectories.
         """
-        new_trajectory_dirs = []
+        if it > 10:
+            raise ValueError("Could not find the specified number of handmade and generated trajectories.")
+
         handmade_demo_dirs = []
         gen_demo_dirs = []
         
@@ -291,21 +294,33 @@ class TrajectoryDataset(Dataset):
         handmade_demo_dirs = random.sample(population=handmade_demo_dirs, 
                                            k=min(n_handmades, len(handmade_demo_dirs)))
  
+        gen_run_dirs = []
         # get all generated demos for the previously selected handmade demos
         for handmade_demo in handmade_demo_dirs:
-            gen_run_dirs = [dir for dir in new_trajectory_dirs if dir.name.startswith(handmade_demo.name) and 'randomized' in dir.name]
-            for gen_run_dir in gen_run_dirs:
-                gen_demo_dirs.append([folder for folder in gen_run_dir.iterdir() if folder.is_dir()])
-                
+            gen_run_dirs += [dir for dir in trajectory_dirs if dir.name.startswith(handmade_demo.name) and 'randomized' in dir.name]
+            
+        for gen_run_dir in gen_run_dirs:
+            gen_demo_dirs += [os.path.join(gen_run_dir,x) for x in  os.listdir(gen_run_dir)]
+
+        if n_generated > len(gen_demo_dirs):
+            return self.get_trajectories(trajectory_dirs, n_handmades, n_generated, it+1)
+
+  
         # randomly choose n_generated generated demos
         gen_demo_dirs = random.sample(gen_demo_dirs, n_generated)
 
         # append the selected handmade and generated demos to the trajectory_dirs list
         new_trajectory_dirs = handmade_demo_dirs + gen_demo_dirs
 
+        print("handmade_demo_dirs", len(handmade_demo_dirs))
+        print("gen_run_dirs", len(gen_run_dirs))
+        print("gen_demo_dirs", len(gen_demo_dirs))
+        print("n_generated", n_generated)  
+        print("n_handmades", n_handmades)  
+
         assert(len(handmade_demo_dirs) == min(n_handmades, len(handmade_demo_dirs))), f"Number of selected handmade trajectories does not match the specified number of handmade trajectories."
         assert(len(gen_demo_dirs) == n_generated), f"Number of selected generated trajectories does not match the specified number of generated trajectories."
-        assert(len(new_trajectory_dirs) == min(n_handmades, len(handmade_demo_dirs) + n_generated)), f"Number of selected trajectories does not match the sum of the selected handmade and generated trajectories."
+        assert(len(new_trajectory_dirs) == len(handmade_demo_dirs) + len(gen_demo_dirs)), f"Number of selected trajectories does not match the sum of the selected handmade and generated trajectories."
         return new_trajectory_dirs
 
 
@@ -636,6 +651,8 @@ class SubsequenceTrajectoryDataset(TrajectoryDataset):
         ignore_shorter_trajectories: bool = False,
         pad_start: int = 0,
         pad_end: int = 0,
+        n_handmades: int = None,
+        n_generated: int = 0,
     ):
         super().__init__(
             trajectory_dirs=trajectory_dirs,
@@ -655,6 +672,8 @@ class SubsequenceTrajectoryDataset(TrajectoryDataset):
             recalculate_velocities_from_to=recalculate_velocities_from_to,
             pad_start=pad_start,
             pad_end=pad_end,
+            n_handmades= n_handmades,
+            n_generated =n_generated,
         )
 
         self.subsequence_length = subsequence_length
