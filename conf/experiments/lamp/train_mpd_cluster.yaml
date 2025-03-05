@@ -21,8 +21,7 @@ hydra:
       cpus-per-task: 4  # maybe more?
   sweeper:
     params:
-      dataset_config: dataset_0, dataset_1, dataset_2, dataset_3, dataset_4, dataset_5, dataset_300_1, dataset_300_2, dataset_300_3, dataset_300_4, dataset_300_5 
-
+      dataset_config: dataset_0, dataset_1, dataset_2
 
 # Set what should be used to determine if model performance increased in testing in environment
 performance_metric: reward #end_point_deviation # can be anything that is returned in the dict of workspace.test_agent(agent) or in epoch_info
