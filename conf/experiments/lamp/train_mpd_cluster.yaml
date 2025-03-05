@@ -8,12 +8,13 @@ defaults:
   - override /agent_config/model_config/inner_model_config: prodmp_transformer # <- this is defined in ./conf/agent_config/model_config/inner_model_config/prodmp_transformer.yaml
   - _self_
   - override /hydra/launcher: submitit_slurm
+  - platform: bwuni_all_gpus
 
 hydra:
   mode: MULTIRUN  # needed for launcher to be used
   launcher:
     # launcher/cluster specific options
-    partition: "bwuni_all_gpus"
+    # partition: "bwuni_all_gpus"
     timeout_min: 1800  # in minutes, maximum time on this queue
     gres: gpu:1  # one gpu allocated
     mem_per_gpu: 65536  # in MB
