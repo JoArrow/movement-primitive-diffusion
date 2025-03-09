@@ -349,7 +349,7 @@ def parse_wandb_to_hydra_config(wandb_config: DictConfig) -> DictConfig:
         if key == "wandb_version":
             continue
 
-        if "desc" in value and "value" in value:
+        if "value" in value: # and "desc" in value
             hydra_config[key] = value["value"]
         else:
             raise ValueError(f"Expected {key} to have a value and a description, got {value=}")
