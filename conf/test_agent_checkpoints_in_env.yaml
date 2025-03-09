@@ -1,16 +1,16 @@
 
-config: wandb/run-20250218_180505-410af9u9/files/config.yaml
-checkpoint_dir: wandb/run-20250218_180505-410af9u9/files
-# For example:
-# config: model_checkpoints/run-id/config.yaml
-# checkpoint_dir: model_checkpoints/run-id/
+config: wandb/wandb_cluster/run-20250306_145050-orn0kdnx/files/config.yaml
+checkpoint_dir: wandb/wandb_cluster/run-20250306_145050-orn0kdnx/files
 
-# current best
-# run-20250218_180505-410af9u9
+# 
+# wandb/wandb_cluster/run-20250306_145050-orn0kdnx
+
+# 290, 0
+# wandb/run-20250307_104850-apce3idz
 
 weight_file_regex: '^model_epoch_([0-9]+)\.pth$'
 
-num_trajectories: 10
+num_trajectories: 50
 
 to_change:
   agent_config:
@@ -19,7 +19,7 @@ to_change:
     diffusion_steps: 35
 
 # Set what should be used to determine if model performance increased in testing in environment
-performance_metric: sucess_rate_grabbed_hood #success_rate # can be anything that is returned in the dict of workspace.test_agent(agent)
+performance_metric: reward #success_rate # can be anything that is returned in the dict of workspace.test_agent(agent)
 performance_direction: max # {min, max}
 
 
