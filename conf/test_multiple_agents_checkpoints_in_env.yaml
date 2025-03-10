@@ -1,20 +1,9 @@
 
-runs_parent_folder: wandb/wandb_cluster/
+#run_folder: wandb/wandb_cluster/run-20250306_142016-5ru26uv5/
 
 config_location_in_run_folder: /files/config.yaml
 
 checkpoint_dirs_location_in_run_folder: /files
-
-# configs: 
-#   - wandb/wandb_cluster/run-20250306_145050-orn0kdnx/files/config.yaml
-# checkpoint_dirs: 
-#   - wandb/wandb_cluster/run-20250306_145050-orn0kdnx/files
-
-# 
-# wandb/wandb_cluster/run-20250306_145050-orn0kdnx
-
-# 290, 0
-# wandb/run-20250307_104850-apce3idz
 
 weight_file_regex: '^model_epoch_([0-9]+)\.pth$'
 
