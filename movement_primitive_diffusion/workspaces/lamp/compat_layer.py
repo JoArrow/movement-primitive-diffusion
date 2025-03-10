@@ -1,9 +1,3 @@
-#from omni.isaac.lab.app import AppLauncher
-
-# Launch the simulation app
-#app_launcher = AppLauncher(headless=True)
-#simulation_app = app_launcher.app
-
 from copy import deepcopy
 from typing import Any, Dict, List, Tuple, Optional, Union
 from collections import deque, defaultdict
